@@ -147,9 +147,8 @@ TEST_F(NginxConfigStringParserTest, UnbalancedLeftBracesConfig) {
   EXPECT_FALSE(ParseString("foo { { bar; }"));
 }
 
-//FAILS
 TEST_F(NginxConfigStringParserTest, MultipleConsecutiveBracesConfig) {
-  EXPECT_FALSE(ParseString("foo { bar; } bar { cat; }"));
+  EXPECT_TRUE(ParseString("foo { bar; } bar { cat; }"));
 }
 
 
