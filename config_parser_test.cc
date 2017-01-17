@@ -1,5 +1,19 @@
 #include "gtest/gtest.h"
 #include "config_parser.h"
+#include <sstream>
+#include <string>
+
+using namespace std;
+
+class NginxConfigStringParserTest : public ::testing::Test {
+	protected:
+		bool ParseString(string config_string) {
+			stringstream config_stream(config_string);
+			return _parser.Parse(&config_stream, &_out_config);
+		}
+		NginxConfigParser _parser;
+		NginxConfig _out_config;
+};
 
 TEST(NginxConfigParserTest, SimpleConfig) {
   NginxConfigParser parser;
@@ -9,3 +23,148 @@ TEST(NginxConfigParserTest, SimpleConfig) {
 
   EXPECT_TRUE(success);
 }
+//FAILS
+TEST_F(NginxConfigStringParserTest, ZeroStatementConfig) {
+  EXPECT_TRUE(ParseString(""));
+  EXPECT_EQ(0, _out_config.statements_.size()) << "Expected 0 statements";
+}
+
+TEST_F(NginxConfigStringParserTest, OneStatementOneTokenConfig) {
+  EXPECT_TRUE(ParseString("foo;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, UnnecessaryWhitespaceConfig) {
+  EXPECT_TRUE(ParseString("  foo           ;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, UnnecessaryNewlineConfig) {
+  EXPECT_TRUE(ParseString("\n  foo    \n       ;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, UnnecessaryTabConfig) {
+  EXPECT_TRUE(ParseString("\t  foo    \t       ;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, OneStatementMultipleTokenConfig) {
+  EXPECT_TRUE(ParseString("foo bar cat;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(3, _out_config.statements_.at(0)->tokens_.size()) << "Expected 3 tokens";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+  EXPECT_EQ("bar", _out_config.statements_.at(0)->tokens_.at(1));
+  EXPECT_EQ("cat", _out_config.statements_.at(0)->tokens_.at(2));
+}
+
+TEST_F(NginxConfigStringParserTest, MultipleStatementOneLineConfig) {
+  EXPECT_TRUE(ParseString("foo bar; cat foo; bar cat;"));
+  EXPECT_EQ(3, _out_config.statements_.size()) << "Expected 3 statements";
+  EXPECT_EQ(2, _out_config.statements_.at(0)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ(2, _out_config.statements_.at(1)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ(2, _out_config.statements_.at(2)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+  EXPECT_EQ("bar", _out_config.statements_.at(0)->tokens_.at(1));
+  EXPECT_EQ("cat", _out_config.statements_.at(1)->tokens_.at(0));
+  EXPECT_EQ("foo", _out_config.statements_.at(1)->tokens_.at(1));
+  EXPECT_EQ("bar", _out_config.statements_.at(2)->tokens_.at(0));
+  EXPECT_EQ("cat", _out_config.statements_.at(2)->tokens_.at(1));
+}
+
+TEST_F(NginxConfigStringParserTest, MultipleStatementSeparateLinesConfig) {
+  EXPECT_TRUE(ParseString("foo bar;\n cat foo;\nbar cat;"));
+  EXPECT_EQ(3, _out_config.statements_.size()) << "Expected 3 statements";
+  EXPECT_EQ(2, _out_config.statements_.at(0)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ(2, _out_config.statements_.at(1)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ(2, _out_config.statements_.at(2)->tokens_.size()) << "Expected 2 tokens";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+  EXPECT_EQ("bar", _out_config.statements_.at(0)->tokens_.at(1));
+  EXPECT_EQ("cat", _out_config.statements_.at(1)->tokens_.at(0));
+  EXPECT_EQ("foo", _out_config.statements_.at(1)->tokens_.at(1));
+  EXPECT_EQ("bar", _out_config.statements_.at(2)->tokens_.at(0));
+  EXPECT_EQ("cat", _out_config.statements_.at(2)->tokens_.at(1));
+}
+
+TEST_F(NginxConfigStringParserTest, MissingSemiColonConfig) {
+  EXPECT_FALSE(ParseString("foo"));
+}
+
+TEST_F(NginxConfigStringParserTest, NoTokenConfig) {
+  EXPECT_FALSE(ParseString(";"));
+}
+
+//IS THIS CORRECT OR WRONG??
+TEST_F(NginxConfigStringParserTest, OneTokenBracesConfig) {
+  EXPECT_TRUE(ParseString("foo { bar; }"));
+  EXPECT_EQ(2, _out_config.statements_.size()) << "Expected 2 statements";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ(1, _out_config.statements_.at(1)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+  EXPECT_EQ("bar", _out_config.statements_.at(0)->tokens_.at(1));
+}
+
+TEST_F(NginxConfigStringParserTest, NoTokenBeforeBracesConfig) {
+  EXPECT_FALSE(ParseString("{ bar }"));
+}
+
+//IS THIS CORRECT OR WRONG??
+TEST_F(NginxConfigStringParserTest, OneTokenNewLineBracesConfig) {
+  EXPECT_TRUE(ParseString("foo\n { bar; }"));
+  EXPECT_EQ(2, _out_config.statements_.size()) << "Expected 2 statements";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ(1, _out_config.statements_.at(1)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+  EXPECT_EQ("bar", _out_config.statements_.at(0)->tokens_.at(1));
+}
+
+TEST_F(NginxConfigStringParserTest, SemiColonBeforeBracesConfig) {
+  EXPECT_FALSE(ParseString("foo; { bar; }"));
+}
+
+TEST_F(NginxConfigStringParserTest, SemiColonAfterBracesConfig) {
+  EXPECT_FALSE(ParseString("foo { bar; } ;"));
+}
+
+//FAILS
+TEST_F(NginxConfigStringParserTest, EmptyBracesConfig) {
+  EXPECT_TRUE(ParseString("foo { }"));
+}
+
+//FAILS
+TEST_F(NginxConfigStringParserTest, DoubleBracesConfig) {
+  EXPECT_TRUE(ParseString("foo { cat { bar; } }"));
+}
+
+//FAILS
+TEST_F(NginxConfigStringParserTest, UnbalancedMissingRightBraceConfig) {
+  EXPECT_FALSE(ParseString("foo { bar;"));
+}
+
+//FAILS
+TEST_F(NginxConfigStringParserTest, UnbalancedMissingLeftBraceConfig) {
+  EXPECT_FALSE(ParseString("foo bar; }"));
+}
+
+TEST_F(NginxConfigStringParserTest, UnbalancedRightBracesConfig) {
+  EXPECT_FALSE(ParseString("foo { bar; } }"));
+}
+
+TEST_F(NginxConfigStringParserTest, UnbalancedLeftBracesConfig) {
+  EXPECT_FALSE(ParseString("foo { { bar; }"));
+}
+
+//FAILS
+TEST_F(NginxConfigStringParserTest, MultipleConsecutiveBracesConfig) {
+  EXPECT_FALSE(ParseString("foo { bar; } bar { cat; }"));
+}
+
+
