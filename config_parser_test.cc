@@ -24,6 +24,15 @@ TEST(NginxConfigParserTest, SimpleConfig) {
   EXPECT_TRUE(success);
 }
 
+TEST(NginxConfigParserTest, NginxExampleConfig) {
+  NginxConfigParser parser;
+  NginxConfig out_config;
+
+  bool success = parser.Parse("testing_config", &out_config);
+
+  EXPECT_TRUE(success);
+}
+
 TEST_F(NginxConfigStringParserTest, ZeroStatementConfig) {
   EXPECT_FALSE(ParseString(""));
 }
