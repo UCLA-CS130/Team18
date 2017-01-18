@@ -28,8 +28,19 @@ TEST_F(NginxConfigStringParserTest, ZeroStatementConfig) {
   EXPECT_FALSE(ParseString(""));
 }
 
+TEST_F(NginxConfigStringParserTest, ZeroStatementCommentConfig) {
+  EXPECT_FALSE(ParseString("#Comment"));
+}
+
 TEST_F(NginxConfigStringParserTest, OneStatementOneTokenConfig) {
   EXPECT_TRUE(ParseString("foo;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, OneStatementOneTokenCommentConfig) {
+  EXPECT_TRUE(ParseString("foo; #Comment"));
   EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
   EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
   EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
@@ -51,6 +62,13 @@ TEST_F(NginxConfigStringParserTest, UnnecessaryNewlineConfig) {
 
 TEST_F(NginxConfigStringParserTest, UnnecessaryTabConfig) {
   EXPECT_TRUE(ParseString("\t  foo    \t       ;"));
+  EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
+  EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
+  EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
+}
+
+TEST_F(NginxConfigStringParserTest, UnnecessaryReturnConfig) {
+  EXPECT_TRUE(ParseString("\r  foo    \r       ;"));
   EXPECT_EQ(1, _out_config.statements_.size()) << "Expected 1 statement";
   EXPECT_EQ(1, _out_config.statements_.at(0)->tokens_.size()) << "Expected 1 token";
   EXPECT_EQ("foo", _out_config.statements_.at(0)->tokens_.at(0));
@@ -108,6 +126,10 @@ TEST_F(NginxConfigStringParserTest, OneTokenBracesConfig) {
 
 TEST_F(NginxConfigStringParserTest, NoTokenBeforeBracesConfig) {
   EXPECT_FALSE(ParseString("{ bar }"));
+}
+
+TEST_F(NginxConfigStringParserTest, NoSemiColonWithinBracesConfig) {
+  EXPECT_FALSE(ParseString("foo { bar }"));
 }
 
 TEST_F(NginxConfigStringParserTest, OneTokenNewLineBracesConfig) {
