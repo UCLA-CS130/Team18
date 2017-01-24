@@ -14,8 +14,9 @@ int main(int argc, char* argv[]) {
 
   int config_size = (unsigned long) config.statements_[0]->child_block_->statements_.size();
   for (int i = 0; i < config_size; i++) {
-  	if (config.statements_[0]->child_block_->statements_[i]->tokens_[0] == "listen") {
-  		cout << stoi(config.statements_[0]->child_block_->statements_[i]->tokens_[1]) << endl;
+  	shared_ptr<NginxConfigStatement> config_statement= config.statements_[0]->child_block_->statements_[i];
+  	if (config_statement->tokens_[0] == "listen") {
+  		cout << "Port Number: " << stoi(config_statement->tokens_[1]) << endl;
   	}
   }
   return 0;
