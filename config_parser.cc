@@ -27,7 +27,6 @@ std::string NginxConfig::ToString(int depth) {
 
 std::string NginxConfigStatement::ToString(int depth) {
   std::string serialized_statement;
-  std::string last_token;
   for (int i = 0; i < depth; ++i) {
     serialized_statement.append("  ");
   }
@@ -35,16 +34,6 @@ std::string NginxConfigStatement::ToString(int depth) {
     if (i != 0) {
       serialized_statement.append(" ");
     }
-    
-    if (last_token == "listen") {
-    		std::cout << "PORT NUMBER " << tokens_[i] << std::endl;
-    } else if (last_token == "server_name") {
-    		std::cout << "SERVER NAME " << tokens_[i] << std::endl;
-    } else if (last_token == "root") {
-    		std::cout << "ROOT " << tokens_[i] << std::endl;
-    }
-
-    last_token = tokens_[i];    	
     serialized_statement.append(tokens_[i]);
   }
   if (child_block_.get() != nullptr) {
