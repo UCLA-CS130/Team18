@@ -25,6 +25,7 @@ public:
 private:
     void do_read();
     void do_write(std::size_t length);
+    void send_http(int code);
     enum { max_length = 1024 };
     char data_[max_length];
     char out_buf[max_length];
