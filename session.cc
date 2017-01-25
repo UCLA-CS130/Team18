@@ -39,7 +39,6 @@ void Session::do_write(std::size_t length)
         {
             if (!ec)
             {
-                out_buf[0] = '0';
                 do_read();
             }
         });
