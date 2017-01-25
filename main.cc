@@ -22,18 +22,19 @@ int main(int argc, char* argv[]) {
   for (int i = 0; i < config_size; i++) {
   	shared_ptr<NginxConfigStatement> config_statement= config.statements_[0]->child_block_->statements_[i];
   	if (config_statement->tokens_[0] == "listen") {
-  		portno = stoi(config_statement->tokens_[1]);
+  	  portno = stoi(config_statement->tokens_[1]);
   	}
   }
+
   try
   {      
-        boost::asio::io_service io_service;
-        Server s(io_service, atoi(argv[1]));
-        io_service.run();
+    boost::asio::io_service io_service;
+  	Server s(io_service, portno);
+   	io_service.run();
   }
-  catch (std::exception& e)
+  catch (exception& e)
   {
-        cerr << "Exception: " << e.what() << "\n";
+    cerr << "Exception: " << e.what() << "\n";
   }
     return 0;
 }
