@@ -10,6 +10,8 @@
 
 #include <boost/asio.hpp>
 #include <cstdlib>
+#include <array>
+#include <string>
 
 using boost::asio::ip::tcp;
 
@@ -25,7 +27,9 @@ private:
     void do_write(std::size_t length);
     enum { max_length = 1024 };
     char data_[max_length];
+    char out_buf[max_length];
     tcp::socket socket_;
+    std::string msg;
 };
 
 
