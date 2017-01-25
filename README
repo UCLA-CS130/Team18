@@ -1,5 +1,5 @@
-Parser for nginx config files.
+CS130 Team 18 nginx server
 
 Includes code from googletest-1.7.0. See https://code.google.com/p/googletest/
-
 Inspired by https://github.com/fatiherikli/nginxparser
+Uses Boost http://www.boost.org/
