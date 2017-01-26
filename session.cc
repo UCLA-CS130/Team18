@@ -37,9 +37,11 @@ void Session::send_http(int code) {
         default:
             status_line += "400 Bad Request\r\n";
     }
+    std::size_t body_length = msg.find("\r\n\r\n") + size_t(4);
     std::string content_type = "Content-Type: text/plain\r\n";
-    std::string header = status_line + content_type + "\r\n";
-    std::size_t len = header.size() + msg.find("\r\n\r\n") + size_t(4);
+    std::string content_length = "Content-Length: " +  std::to_string((int)body_length) + "\r\n";
+    std::string header = status_line + content_type + content_length + "\r\n";
+    std::size_t len = header.size() + body_length;
     msg = header + msg;
     strncpy(out_buf, msg.c_str(), len);
     std::cout << "SENDING MSG: " << msg;
