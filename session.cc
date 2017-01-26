@@ -18,17 +18,35 @@ void Session::do_read()
             if (!ec) 
             {   if (msg.find("\r\n\r\n") != std::string::npos)
                 {
-                   std::size_t len = msg.find("\r\n\r\n") + size_t(4);
-                   strncpy(out_buf, msg.c_str(), len);
-                   std::cout << "SENDING MSG: " << msg;
-                   msg = "";
-                   do_write(len);
+                    send_http(200);
                 }
                 else 
                     do_read();
             }
         });
       
+}
+
+void Session::send_http(int code) {
+    std::string status_line = "HTTP/1.1 ";
+    switch(code)
+    {
+        case 200: 
+            status_line += "200 OK\r\n";      
+            break;
+        default:
+            status_line += "400 Bad Request\r\n";
+    }
+    std::size_t body_length = msg.find("\r\n\r\n") + size_t(4);
+    std::string content_type = "Content-Type: text/plain\r\n";
+    std::string content_length = "Content-Length: " +  std::to_string((int)body_length) + "\r\n";
+    std::string header = status_line + content_type + content_length + "\r\n";
+    std::size_t len = header.size() + body_length;
+    msg = header + msg;
+    strncpy(out_buf, msg.c_str(), len);
+    std::cout << "SENDING MSG: " << msg;
+    msg = "";
+    do_write(len);
 }
 
 void Session::do_write(std::size_t length)
