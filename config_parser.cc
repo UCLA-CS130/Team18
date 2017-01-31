@@ -25,6 +25,17 @@ std::string NginxConfig::ToString(int depth) {
   return serialized_config;
 }
 
+int NginxConfig::getPort() {
+  int config_size = (unsigned long) statements_[0]->child_block_->statements_.size();
+  for (int i = 0; i < config_size; i++) {
+    std::shared_ptr<NginxConfigStatement> config_statement= statements_[0]->child_block_->statements_[i];
+    if (config_statement->tokens_[0] == "listen") {
+  	  return stoi(config_statement->tokens_[1]);
+  	}
+  }
+  return 0;
+}
+
 std::string NginxConfigStatement::ToString(int depth) {
   std::string serialized_statement;
   for (int i = 0; i < depth; ++i) {

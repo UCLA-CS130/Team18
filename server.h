@@ -10,22 +10,18 @@
 
 #include <cstdlib>
 #include <boost/asio.hpp>
+
 using boost::asio::ip::tcp;
 
-
-class Server
-{
+class Server {
 public:
-    Server(boost::asio::io_service& io_service, short port) 
-        : acceptor_(io_service, tcp::endpoint(tcp::v4(), port)), 
-          socket_(io_service)
-    {do_accept();}
+  Server(short port);
+  void run();
 private:
-    void do_accept();
-    tcp::acceptor acceptor_;
-    tcp::socket socket_;
+  boost::asio::io_service io_service_;
+  void do_accept();
+  tcp::acceptor acceptor_;
+  tcp::socket socket_;
 };
-
-
 
 #endif
