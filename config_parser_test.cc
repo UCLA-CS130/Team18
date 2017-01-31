@@ -193,3 +193,7 @@ TEST_F(NginxConfigStringParserTest, OneDoubleQuoteConfig) {
   EXPECT_FALSE(ParseString("\""));
 }
 
+TEST_F(NginxConfigStringParserTest, ConfigToString) {
+  EXPECT_TRUE(ParseString("foo { bar; }"));
+  EXPECT_EQ("foo {\n  bar;\n}\n", _out_config.ToString()) << "Expected ToString to return different string";
+}
