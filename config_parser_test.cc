@@ -32,10 +32,6 @@ TEST_F(NginxConfigStringParserTest, NonExistingExampleConfig) {
   EXPECT_FALSE(ParseConfig("non_existing_config"));
 }
 
-TEST_F(NginxConfigStringParserTest, ToString) {
-  EXPECT_FALSE(ParseString(""));
-}
-
 TEST_F(NginxConfigStringParserTest, ZeroStatementConfig) {
   EXPECT_FALSE(ParseString(""));
 }
