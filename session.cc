@@ -61,5 +61,3 @@ void Session::do_write(std::size_t length)
             }
         });
 }
-
-
