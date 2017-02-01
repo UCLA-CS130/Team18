@@ -6,31 +6,33 @@
 using namespace std;
 
 class NginxConfigStringParserTest : public ::testing::Test {
-	protected:
-		bool ParseString(string config_string) {
-			stringstream config_stream(config_string);
-			return _parser.Parse(&config_stream, &_out_config);
-		}
-		NginxConfigParser _parser;
-		NginxConfig _out_config;
+  protected:
+  
+    //Tests Parse with config in stringstream form
+    bool ParseString(string config_string) {
+      stringstream config_stream(config_string);
+      return _parser.Parse(&config_stream, &_out_config);
+    }
+  
+    //Tests Parse with path to file containing config
+    bool ParseConfig(string config_file) {
+      return _parser.Parse(config_file.c_str(), &_out_config);
+    }
+
+    NginxConfigParser _parser;
+    NginxConfig _out_config;
 };
 
-TEST(NginxConfigParserTest, SimpleConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
-
-  bool success = parser.Parse("example_config", &out_config);
-
-  EXPECT_TRUE(success);
+TEST_F(NginxConfigStringParserTest, SimpleConfig) {
+  EXPECT_TRUE(ParseConfig("example_config"));
 }
 
-TEST(NginxConfigParserTest, NginxExampleConfig) {
-  NginxConfigParser parser;
-  NginxConfig out_config;
+TEST_F(NginxConfigStringParserTest, NginxExampleConfig) {
+  EXPECT_TRUE(ParseConfig("testing_config"));
+}
 
-  bool success = parser.Parse("testing_config", &out_config);
-
-  EXPECT_TRUE(success);
+TEST_F(NginxConfigStringParserTest, NonExistingExampleConfig) {
+  EXPECT_FALSE(ParseConfig("non_existing_config"));
 }
 
 TEST_F(NginxConfigStringParserTest, ZeroStatementConfig) {
@@ -182,4 +184,15 @@ TEST_F(NginxConfigStringParserTest, MultipleConsecutiveBracesConfig) {
   EXPECT_TRUE(ParseString("foo { bar; } bar { cat; }"));
 }
 
+TEST_F(NginxConfigStringParserTest, OneSingleQuoteConfig) {
+  EXPECT_FALSE(ParseString("\'"));
+}
 
+TEST_F(NginxConfigStringParserTest, OneDoubleQuoteConfig) {
+  EXPECT_FALSE(ParseString("\""));
+}
+
+TEST_F(NginxConfigStringParserTest, ConfigToString) {
+  EXPECT_TRUE(ParseString("foo { bar; }"));
+  EXPECT_EQ("foo {\n  bar;\n}\n", _out_config.ToString()) << "Expected ToString to return different string";
+}
