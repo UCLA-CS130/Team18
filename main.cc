@@ -18,7 +18,8 @@ int main(int argc, char* argv[]) {
     int port = config.getPort();
     if (port) {
       Server s(port);
-   	  s.run();
+      s.start();
+      s.run();
     } else {
       std::cerr << "Invalid port number " << "\n";
       return 0;

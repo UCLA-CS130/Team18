@@ -24,6 +24,7 @@ if __name__ == "__main__":
     proc1 = subprocess.Popen(["./webserver", config_name], stdout = FNULL, \
             stderr=subprocess.STDOUT)    
     while proc1.poll() == None:
+        time.sleep(5)
         try:
             conn = httplib.HTTPConnection("localhost", 12345)
             print "Connected to webserver"

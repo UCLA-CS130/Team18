@@ -11,7 +11,11 @@
 Server::Server(short port)
         : io_service_(),
           acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
-          socket_(io_service_)
+          socket_(io_service_),
+          port_num(port)
+{}
+
+void Server::start()
 {
   do_accept();
 }
@@ -27,7 +31,7 @@ void Server::do_accept()
     [this](boost::system::error_code ec)
     {
       if (!ec) {
-        std::make_shared<Session>(std::move(socket_))->start();
+        std::make_shared<Session>(std::move(&socket_))->start();
       }
 
       do_accept();

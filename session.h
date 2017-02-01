@@ -18,15 +18,19 @@ using boost::asio::ip::tcp;
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(tcp::socket socket)
-        : socket_(std::move(socket)) {}
+    Session(tcp::socket* socket)
+        : socket_(std::move(*socket)) {}
     
     void start() { do_read();}
+    bool check_input(std::size_t length, char* buffer);
+    std::size_t prepare_response(int status, std::string body);
+    std::string output_as_string(std::size_t len);
+
 private:
     void do_read();
     void do_write(std::size_t length);
-    void send_http(int code);
-    enum { max_length = 1024 };
+    void send_http(std::size_t size);
+    enum { max_length = 8192 };
     char data_[max_length];
     char out_buf[max_length];
     tcp::socket socket_;
