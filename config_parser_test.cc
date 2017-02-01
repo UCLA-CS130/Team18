@@ -11,16 +11,16 @@ class NginxConfigStringParserTest : public ::testing::Test {
     //Tests Parse with config in stringstream form
     bool ParseString(string config_string) {
       stringstream config_stream(config_string);
-	    return _parser.Parse(&config_stream, &_out_config);
-	  }
+      return _parser.Parse(&config_stream, &_out_config);
+    }
   
     //Tests Parse with path to file containing config
     bool ParseConfig(string config_file) {
       return _parser.Parse(config_file.c_str(), &_out_config);
-	  }
+    }
 
-	NginxConfigParser _parser;
-	NginxConfig _out_config;
+    NginxConfigParser _parser;
+    NginxConfig _out_config;
 };
 
 TEST_F(NginxConfigStringParserTest, SimpleConfig) {
