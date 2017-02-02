@@ -196,3 +196,8 @@ TEST_F(NginxConfigStringParserTest, ConfigToString) {
   EXPECT_TRUE(ParseString("foo { bar; }"));
   EXPECT_EQ("foo {\n  bar;\n}\n", _out_config.ToString()) << "Expected ToString to return different string";
 }
+
+TEST_F(NginxConfigStringParserTest, GetPort) {
+   EXPECT_TRUE(ParseString("server {\n  listen 12345;\n}"));
+   EXPECT_EQ(12345, _out_config.getPort());
+}
