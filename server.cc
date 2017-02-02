@@ -8,12 +8,18 @@
 #include "server.h"
 #include "session.h"
 
-Server::Server(short port)
+#define DEFAULT_PORT 8080
+
+Server::Server(int port)
         : io_service_(),
           acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
-          socket_(io_service_),
-          port_num(port)
-{}
+          socket_(io_service_)
+{
+  if ((0 < port) && (port < 65535))
+    port_num = port;
+  else 
+    port_num = DEFAULT_PORT;
+}
 
 void Server::start()
 {

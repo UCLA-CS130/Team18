@@ -15,7 +15,7 @@ using boost::asio::ip::tcp;
 
 class Server {
 public:
-  Server(short port);
+  Server(int port);
   void start();
   void run();
   short get_port() {return port_num;}
