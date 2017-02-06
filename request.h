@@ -10,6 +10,7 @@ class Request {
     Request(std::string request_string) 
     {
       message_type = NONE;
+      original_string = request_string;
       ParseRequestString(request_string);
     }
 
@@ -21,6 +22,7 @@ class Request {
     std::string GetType();
 
   private:
+    std::string original_string;
     std::string method;
     std::string uri;
     std::string http_version;
