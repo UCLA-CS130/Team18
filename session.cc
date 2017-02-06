@@ -1,11 +1,12 @@
 #include "session.h"
+#include "echo_handler.h"
 #include "request.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <boost/bind.hpp>
 
-Session::~Session() { delete request; delete response; }
+Session::~Session() { delete handler; delete request; delete response; }
 
 void Session::do_read()
 {
@@ -18,9 +19,19 @@ void Session::do_read()
             {   if (reached_end)
                 {
                     request = new Request(msg, "echo", "static");
-                    std::cout << request->GetMethod() << std::endl;
-                    std::size_t response_size = prepare_response(200, msg);
-                    send_http(response_size);
+                    std::string request_type = request->GetType();
+                    if (request_type == "Echo") {
+                      //handler = new echo_handler();
+                    } else if (request_type == "Static") {
+                      //handler = new static_handler();
+                    } else {
+                      //Should we do_read here? break?
+                    }
+
+                    handler = new echo_handler();
+                    handler->handle_request(request, response);
+                    send_http();
+
                 }
                 else 
                     do_read();
@@ -67,11 +78,12 @@ std::size_t Session::prepare_response(int status, std::string body)
   return len;
 } 
 
-void Session::send_http(std::size_t size) {
-    do_write(size);
+void Session::send_http() {
+    to_send = response->to_buffer();
+    do_write();
 }
 
-void Session::do_write(std::size_t length)
+void Session::do_write()
 {
     auto self(shared_from_this());
     boost::asio::async_write(socket_, boost::asio::buffer(to_send.c_str(), to_send.size()),

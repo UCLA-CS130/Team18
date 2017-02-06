@@ -13,6 +13,7 @@
 #include <array>
 #include <string>
 #include "response.h"
+#include "request_handler.h"
 
 class Request;
 
@@ -22,7 +23,10 @@ class Session : public std::enable_shared_from_this<Session>
 {
 public:
     Session(tcp::socket* socket)
-        : socket_(std::move(*socket)), request(nullptr), response(new Response()) {}
+        : socket_(std::move(*socket)),
+          handler(nullptr),
+          request(nullptr),
+          response(new Response()) {}
     ~Session();
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
@@ -31,13 +35,14 @@ public:
 
 private:
     void do_read();
-    void do_write(std::size_t length);
-    void send_http(std::size_t size);
+    void do_write();
+    void send_http();
     enum { max_length = 8192 };
     char data_[max_length];
     std::string to_send;
     tcp::socket socket_;
     std::string msg;
+    request_handler* handler;
     Request* request;
     Response* response;
 };
