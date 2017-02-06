@@ -12,9 +12,9 @@
 #include <cstdlib>
 #include <array>
 #include <string>
+#include "response.h"
 
 class Request;
-class Response;
 
 using boost::asio::ip::tcp;
 

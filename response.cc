@@ -34,7 +34,7 @@ std::string Response::get_header(std::string header) {
   return formatted_header;
 }
 
-std::string to_string(Response::status_type status) {
+std::string Response::to_string(Response::status_type status) {
   switch (status) {
     case Response::ok:
       return status_strings::ok;
