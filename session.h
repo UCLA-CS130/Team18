@@ -24,7 +24,7 @@ public:
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
     std::size_t prepare_response(int status, std::string body);
-    std::string output_as_string(std::size_t len);
+    std::string OutputToString();
 
 private:
     void do_read();
@@ -32,7 +32,7 @@ private:
     void send_http(std::size_t size);
     enum { max_length = 8192 };
     char data_[max_length];
-    char out_buf[max_length];
+    std::string to_send;
     tcp::socket socket_;
     std::string msg;
 };

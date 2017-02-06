@@ -23,7 +23,7 @@ class SessionInputTest : public ::testing::Test {
     tcp::socket socket(io_service);
     Session s(&socket);
     std::size_t length = s.prepare_response(status_code, str);
-    return s.output_as_string(length);
+    return s.OutputToString();
   }
 };
 

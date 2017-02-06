@@ -34,14 +34,10 @@ bool Session::check_input(std::size_t length, char* buffer)
   return (msg.find("\r\n\r\n") != std::string::npos);
 }
 
-std::string Session::output_as_string(std::size_t len)
+std::string Session::OutputToString()
 {
-    char* temp = new char[len+1];
-    strncpy(temp, out_buf, len);
-    temp[len] = '\0';
-    std::string return_string = std::string(temp);
-    delete temp;
-    return return_string;       
+    std::string s(to_send);
+    return s;       
 }
 
 std::size_t Session::prepare_response(int status, std::string body)
@@ -61,7 +57,7 @@ std::size_t Session::prepare_response(int status, std::string body)
   std::string header = status_line + content_type + content_length + "\r\n";
   std::size_t len = header.size() + body_length;
   body = header + body;
-  strncpy(out_buf, body.c_str(), len);
+  to_send = body; 
   std::cout << "SENDING MSG: " << body;
   msg = "";
   return len;
@@ -74,7 +70,7 @@ void Session::send_http(std::size_t size) {
 void Session::do_write(std::size_t length)
 {
     auto self(shared_from_this());
-    boost::asio::async_write(socket_, boost::asio::buffer(out_buf, length),
+    boost::asio::async_write(socket_, boost::asio::buffer(to_send.c_str(), to_send.size()),
         [this, self](boost::system::error_code ec, std::size_t)
         {
             if (!ec)
