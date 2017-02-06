@@ -13,14 +13,16 @@
 #include <array>
 #include <string>
 
+class Request;
+
 using boost::asio::ip::tcp;
 
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
     Session(tcp::socket* socket)
-        : socket_(std::move(*socket)) {}
-    
+        : socket_(std::move(*socket)), request(nullptr) {}
+    ~Session();
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
     std::size_t prepare_response(int status, std::string body);
@@ -35,6 +37,7 @@ private:
     std::string to_send;
     tcp::socket socket_;
     std::string msg;
+    Request* request;
 };
 
 

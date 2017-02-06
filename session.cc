@@ -1,9 +1,11 @@
 #include "session.h"
+#include "request.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <boost/bind.hpp>
 
+Session::~Session() { delete request; }
 
 void Session::do_read()
 {
@@ -15,6 +17,8 @@ void Session::do_read()
             if (!ec) 
             {   if (reached_end)
                 {
+                    request = new Request(msg, "echo", "static");
+                    std::cout << request->GetMethod() << std::endl;
                     std::size_t response_size = prepare_response(200, msg);
                     send_http(response_size);
                 }
