@@ -1,0 +1,31 @@
+#include "gtest/gtest.h"
+#include "response.h"
+
+class ResponseTest : public ::testing::Test {
+  protected:
+    std::string GetBuffer(std::string http_version,
+    					  Response::status_type status,
+    					  std::map<std::string, std::string> headers,
+    					  std::string body) {
+      _response = new Response();
+      _response->http_version = http_version;
+      _response->status = status;
+      _response->headers = headers;
+      _response->body = body;
+      return _response->to_buffer();
+    }
+
+    Response* _response;	
+};
+
+TEST_F(ResponseTest, SimpleResponse) {
+  std::map<std::string, std::string> headers;
+  headers["Content-Type"] = "text/plain";
+  headers["Content-Length"] = "10";
+  EXPECT_EQ("HTTP/1.0 200 OK\r\nContent-Length: 10\r\nContent-Type: text/plain\r\n\r\nVery simple body",
+  			GetBuffer("HTTP/1.0",
+					  Response::ok,
+					  headers,
+					  "Very simple body")
+  		   ) << "Expected different buffer";
+}

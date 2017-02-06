@@ -5,8 +5,9 @@ case `uname` in
   Linux)
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -fprofile-arcs -ftest-coverage -c ${GTEST_DIR}/src/gtest-all.cc
     ar -rv libgtest.a gtest-all.o
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request.cc response.cc session.cc server.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc request.cc response.cc session.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request.cc response.cc request_handler.cc echo_handler.cc session.cc server.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc request.cc response.cc request_handler.cc echo_handler.cc session.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage response_test.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o response_test
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test ;;
  
   Darwin)
