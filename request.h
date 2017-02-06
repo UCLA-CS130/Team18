@@ -7,7 +7,8 @@
 
 class Request {
   public:
-    Request(std::string request_string) 
+    Request(std::string request_string, std::string echo, std::string stat) 
+    : echo_string(echo), static_string(stat)
     {
       message_type = NONE;
       original_string = request_string;
@@ -31,6 +32,8 @@ class Request {
     bool DecodeStatus(std::string status_line);
     bool GetRequestType(std::string uri);
     enum Type { NONE, ECHO, STAT };
+    std::string echo_string;
+    std::string static_string;
     Type message_type;
 };
 

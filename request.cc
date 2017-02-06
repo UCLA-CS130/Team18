@@ -79,9 +79,9 @@ std::string Request::GetType()
 
 bool Request::GetRequestType(std::string uri)
 {
-  if (!uri.substr(1,4).compare("echo"))
+  if (!uri.substr(1,4).compare(echo_string))
     message_type = ECHO;
-  else if (!uri.substr(1,6).compare("static"))
+  else if (!uri.substr(1,6).compare(static_string))
     message_type = STAT;
   else
     message_type = NONE;
