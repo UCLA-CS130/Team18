@@ -8,7 +8,7 @@ namespace status_strings {
   const std::string not_found = "404 Not Found\r\n";
 }
 
-std::string response::to_buffer() {
+std::string Response::to_buffer() {
   std::string response_msg = "HTTP/" + http_version + " " + to_string(status);
 
   std::map<std::string, std::string>::iterator it;
@@ -21,7 +21,7 @@ std::string response::to_buffer() {
   return response_msg;
 }
 
-std::string response::get_header(std::string header) {
+std::string Response::get_header(std::string header) {
   std::string formatted_header = "";
   std::string header_value = headers[header];
 
@@ -34,13 +34,13 @@ std::string response::get_header(std::string header) {
   return formatted_header;
 }
 
-std::string to_string(response::status_type status) {
+std::string to_string(Response::status_type status) {
   switch (status) {
-    case response::ok:
+    case Response::ok:
       return status_strings::ok;
-    case response::bad_request:
+    case Response::bad_request:
       return status_strings::bad_request;
-    case response::not_found:
+    case Response::not_found:
       return status_strings::not_found;
   }
 }
