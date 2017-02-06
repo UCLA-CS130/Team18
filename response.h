@@ -6,12 +6,19 @@
 
 class response {
   public:
-    std::size_t to_buffer(char* response_buf);
+    std::string to_buffer();
+    std::string http_version;
+    enum status_type {
+  	  ok = 200,
+  	  bad_request = 400,
+  	  not_found = 404
+    } status;
     std::map<std::string, std::string> headers;
     std::string body;
     std::size_t length;
   private:
   	std::string get_header(std::string header);
+  	std::string to_string(response::status_type status);
 };
 
 #endif
