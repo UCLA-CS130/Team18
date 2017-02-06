@@ -19,6 +19,15 @@ void Session::do_read()
             {   if (reached_end)
                 {
                     request = new Request(msg, "echo", "static");
+                    std::string request_type = request->GetType();
+                    if (request_type == "Echo") {
+                      //handler = new echo_handler();
+                    } else if (request_type == "Static") {
+                      //handler = new static_handler();
+                    } else {
+                      //Should we do_read here? break?
+                    }
+
                     handler = new echo_handler();
                     handler->handle_request(request, response);
                     send_http();
