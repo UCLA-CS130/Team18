@@ -5,7 +5,7 @@
 #include <iostream>
 #include <boost/bind.hpp>
 
-Session::~Session() { delete request; }
+Session::~Session() { delete request; delete response; }
 
 void Session::do_read()
 {
