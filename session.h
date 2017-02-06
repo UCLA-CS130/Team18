@@ -12,6 +12,7 @@
 #include <cstdlib>
 #include <array>
 #include <string>
+#include "response.h"
 
 class Request;
 
@@ -21,7 +22,7 @@ class Session : public std::enable_shared_from_this<Session>
 {
 public:
     Session(tcp::socket* socket)
-        : socket_(std::move(*socket)), request(nullptr) {}
+        : socket_(std::move(*socket)), request(nullptr), response(new Response()) {}
     ~Session();
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
@@ -38,6 +39,7 @@ private:
     tcp::socket socket_;
     std::string msg;
     Request* request;
+    Response* response;
 };
 
 
