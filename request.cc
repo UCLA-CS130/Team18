@@ -85,6 +85,10 @@ std::string Request::GetType()
   }
 }
 
+std::string Request::GetOriginalString() {
+  return original_string;
+}
+
 bool Request::GetRequestType(std::string uri)
 {
   if (!uri.substr(1,echo_string.size()).compare(echo_string))

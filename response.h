@@ -15,7 +15,6 @@ class Response {
     } status;
     std::map<std::string, std::string> headers;
     std::string body;
-    std::size_t length;
   private:
     std::string get_header(std::string header);
     std::string to_string(Response::status_type status);
