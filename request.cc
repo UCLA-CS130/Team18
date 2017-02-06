@@ -53,7 +53,7 @@ bool Request::DecodeStatus(std::string status_line)
   back = status_line.find('\r', front);
   if (back == std::string::npos)
     return false;
-  http_version = status_line.substr(front, back - front);
+  http_version = status_line.substr(front + 5, back - front-5);
   return true;
 }
 
