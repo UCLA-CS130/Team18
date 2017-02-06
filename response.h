@@ -17,8 +17,8 @@ class Response {
     std::string body;
     std::size_t length;
   private:
-  	std::string get_header(std::string header);
-  	std::string to_string(Response::status_type status);
+    std::string get_header(std::string header);
+    std::string to_string(Response::status_type status);
 };
 
 #endif
