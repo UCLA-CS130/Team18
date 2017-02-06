@@ -14,6 +14,7 @@ class Request {
     std::map<std::string,std::string> GetHeaders();
     std::string GetHeader(std::string header_name);
     std::string GetType();
+    std::string GetOriginalString();
     enum Type { NONE, ECHO_MODE, STAT_MODE };
  
   private:
