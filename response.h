@@ -4,7 +4,7 @@
 #include <string>
 #include <map>
 
-class response {
+class Response {
   public:
     std::string to_buffer();
     std::string http_version;
@@ -18,7 +18,7 @@ class response {
     std::size_t length;
   private:
   	std::string get_header(std::string header);
-  	std::string to_string(response::status_type status);
+  	std::string to_string(Response::status_type status);
 };
 
 #endif
