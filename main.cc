@@ -15,9 +15,10 @@ int main(int argc, char* argv[]) {
     NginxConfigParser config_parser;
     NginxConfig config;
     config_parser.Parse(argv[1], &config);
-    int port = config.getPort();
-    if (port) {
-      Server s(port);
+    config_options* options = new config_options();
+    config.GetConfigOptions(options);
+    if (options->port) {
+      Server s(options);
       s.start();
       s.run();
     } else {

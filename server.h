@@ -10,17 +10,19 @@
 
 #include <cstdlib>
 #include <boost/asio.hpp>
+#include "config_options.h"
 
 using boost::asio::ip::tcp;
 
 class Server {
 public:
-  Server(int port);
+  Server(config_options* options);
   void start();
   void run();
   short get_port() {return port_num;}
 private:
   boost::asio::io_service io_service_;
+  config_options* options_;
   void do_accept();
   tcp::acceptor acceptor_;
   tcp::socket socket_;

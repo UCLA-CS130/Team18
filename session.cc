@@ -20,10 +20,7 @@ void Session::do_read()
             {   if (reached_end)
                 {
                     std::cout << "REACHED END" << std::endl;
-                    std::map<std::string,std::string> m;
-                    m.insert(std::make_pair("static","src"));
-                    m.insert(std::make_pair("static2","src2"));
-                    request = new Request(msg, "echo", m);
+                    request = new Request(msg, options_->echo_path, options_->static_paths);
                     std::string request_type = request->GetType();
                     if (!request_type.compare("Echo")) {
                       handler = new echo_handler();
