@@ -15,6 +15,8 @@ case `uname` in
     ./request_test && gcov -r request.cc 
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage echo_handler_test.cc echo_handler.cc response.cc request.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o echo_handler_test
     ./echo_handler_test && gcov -r echo_handler.cc
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage static_handler_test.cc static_handler.cc response.cc request.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o static_handler_test
+    ./static_handler_test && gcov -r static_handler.cc 
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage bad_request_handler_test.cc bad_request_handler.cc response.cc request.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o bad_request_handler_test
     ./bad_request_handler_test && gcov -r bad_request_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
