@@ -199,5 +199,7 @@ TEST_F(NginxConfigStringParserTest, ConfigToString) {
 
 TEST_F(NginxConfigStringParserTest, GetPort) {
    EXPECT_TRUE(ParseString("server {\n  listen 12345;\n}"));
-   EXPECT_EQ(12345, _out_config.getPort());
+   config_options* options = new config_options();
+   _out_config.GetConfigOptions(options);
+   EXPECT_EQ(12345, options->port);
 }

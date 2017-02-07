@@ -4,25 +4,33 @@
 
 using boost::asio::ip::tcp;
 
-TEST(ServerTest, GetPort) {
-  Server s(1024);
-  s.start();
-  EXPECT_EQ(1024, s.get_port()) << "Expected port to be 1024";
+class ServerTest : public ::testing::Test {
+  protected:
+    int CreateServerGetPort(int port) {
+      options_ = new config_options();
+      options_->port = port;
+      Server server_(options_);
+      return server_.get_port();
+    }
+    void CleanUp() {
+      delete options_;
+    }
+
+    config_options* options_;
+};
+
+TEST_F(ServerTest, GetPort) {
+  EXPECT_EQ(1024, CreateServerGetPort(1024)) << "Expected port to be 1024";
+  CleanUp();
 }
 
-TEST(ServerTest, OverflowPort) {
-  Server s(65535);
-  s.start();
-  EXPECT_EQ(8080, s.get_port()) << "Expected port to be -1";
+TEST_F(ServerTest, OverflowPort) {
+  EXPECT_EQ(8080, CreateServerGetPort(65535)) << "Expected port to be -1";
+  CleanUp();
 }
 
-TEST(ServerTest, NegativePort) {
-  Server s(-1);
-  s.start();
-  EXPECT_EQ(8080, s.get_port()) << "Expected port to be 1";
+TEST_F(ServerTest, NegativePort) {
+  EXPECT_EQ(8080, CreateServerGetPort(-1)) << "Expected port to be 1";
+  CleanUp();
 }
 
-TEST(ServerTest, RunAndAccept) {
-  Server s(1024);
-  s.run();
-}
