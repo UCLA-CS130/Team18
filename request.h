@@ -7,7 +7,8 @@
 
 class Request {
   public:
-    Request(std::string request_string, std::string echo, std::string stat);
+    Request(std::string request_string, std::string echo, 
+              std::map<std::string,std::string> stat);
     std::string GetMethod();
     std::string GetURI();
     std::string GetVersion();
@@ -15,6 +16,8 @@ class Request {
     std::string GetHeader(std::string header_name);
     std::string GetType();
     std::string GetOriginalString();
+    std::string GetFilePath();
+    std::string GetStaticPath();
     enum Type { NONE, ECHO_MODE, STAT_MODE };
  
   private:
@@ -27,8 +30,10 @@ class Request {
     bool DecodeStatus(std::string status_line);
     bool GetRequestType(std::string uri);
     Request::Type message_type;
+    std::map<std::string,std::string> static_map;
     std::string echo_string;
-    std::string static_string;
+    std::string static_path;
+    std::string file_path;
 };
 
 

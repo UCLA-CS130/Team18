@@ -4,9 +4,11 @@
 #include <sstream>
 #include <map>
 
-Request::Request(std::string request_string, std::string echo, std::string stat)
-: echo_string(echo), static_string(stat)
+Request::Request(std::string request_string, std::string echo, 
+                 std::map<std::string,std::string> stat)
+: static_map(stat)
 {
+  echo_string = echo;
   message_type = NONE;
   original_string = request_string;
   ParseRequestString(request_string);
@@ -93,9 +95,19 @@ bool Request::GetRequestType(std::string uri)
 {
   if (!uri.substr(1,echo_string.size()).compare(echo_string))
     message_type = ECHO_MODE;
-  else if (!uri.substr(1,static_string.size()).compare(static_string))
-    message_type = STAT_MODE;
   else {
+    for (std::map<std::string,std::string>::iterator it = static_map.begin();
+            it != static_map.end(); it++)
+    {
+       std::size_t slash = uri.find("/", 1);
+       if (!uri.substr(1, slash-1).compare(it->first))
+       {
+          message_type = STAT_MODE;
+          static_path = it->first;
+          file_path = it->second;
+          return true;
+       }
+    }
     message_type = NONE;
     return false;
   }
@@ -106,4 +118,5 @@ std::string Request::GetMethod() { return method; }
 std::string Request::GetURI() { return uri; }
 std::string Request::GetVersion() { return http_version; }
 std::map<std::string,std::string> Request::GetHeaders() { return headers; }
-
+std::string Request::GetStaticPath() { return static_path; }
+std::string Request::GetFilePath() { return file_path; }
