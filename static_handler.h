@@ -3,13 +3,14 @@
 
 #include "request_handler.h"
 #include <string>
+#include <map>
 class Request;
 class Response;
 
 
 class StaticHandler: public request_handler {
   public:
-    StaticHandler(std::string filepath, std::string staticpath);
+    StaticHandler();
     virtual void handle_request(Request* req, Response* rep);
 
   private:
@@ -18,8 +19,6 @@ class StaticHandler: public request_handler {
     std::string GetContentType();
     void SetNotFound(Request* req, Response* res);
     void SetOk(Request* req, Response* res, std::string file_body);
-    std::string file_path;
-    std::string static_path;
 };
 
 #endif

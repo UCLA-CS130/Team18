@@ -5,15 +5,15 @@
 #include <fstream>
 #include <sstream>
 
-StaticHandler::StaticHandler(std::string filepath,std::string staticpath)
+StaticHandler::StaticHandler()
 {
-  file_path = filepath;
-  static_path = staticpath;
   ext = NOEXT; 
 }
 
 void StaticHandler::handle_request(Request* req, Response* rep)
 {  
+  std::string static_path = req->GetStaticPath();
+  std::string file_path = req->GetFilePath();
   std::string request_uri = req->GetURI();
   GetExtension(request_uri);
   
