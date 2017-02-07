@@ -9,7 +9,7 @@ namespace status_strings {
 }
 
 std::string Response::to_buffer() {
-  std::string response_msg = http_version + " " + to_string(status);
+  std::string response_msg = "HTTP/" +  http_version + " " + to_string(status);
   std::map<std::string, std::string>::iterator it;
   for (it = headers.begin(); it != headers.end(); it++) {
     response_msg += get_header(it->first);

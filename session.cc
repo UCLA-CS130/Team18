@@ -1,6 +1,7 @@
 #include "session.h"
 #include "echo_handler.h"
 #include "request.h"
+#include "static_handler.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
@@ -18,20 +19,24 @@ void Session::do_read()
             if (!ec) 
             {   if (reached_end)
                 {
+                    std::cout << "REACHED END" << std::endl;
                     request = new Request(msg, "echo", "static");
                     std::string request_type = request->GetType();
-                    if (request_type == "Echo") {
-                      //handler = new echo_handler();
-                    } else if (request_type == "Static") {
-                      //handler = new static_handler();
+                    if (!request_type.compare("Echo")) {
+                      handler = new echo_handler();
+                    } else if (!request_type.compare( "Static")) {
+                      handler = new StaticHandler("src", "static");
                     } else {
-                      //Should we do_read here? break?
+                      handler = new echo_handler();
                     }
 
-                    handler = new echo_handler();
                     handler->handle_request(request, response);
                     send_http();
-
+                    delete request;
+                    delete response;
+                    delete handler;
+                    msg = "";
+                    response = new Response();
                 }
                 else 
                     do_read();
