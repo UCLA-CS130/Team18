@@ -18,6 +18,7 @@ class Request {
     std::string GetOriginalString();
     std::string GetFilePath();
     std::string GetStaticPath();
+    bool IsValid();
     enum Type { NONE, ECHO_MODE, STAT_MODE };
  
   private:
@@ -34,6 +35,7 @@ class Request {
     std::string echo_string;
     std::string static_path;
     std::string file_path;
+    bool valid;
 };
 
 
