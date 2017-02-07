@@ -14,6 +14,7 @@
 #include <string>
 #include "response.h"
 #include "request_handler.h"
+#include "config_options.h"
 
 class Request;
 
@@ -22,8 +23,9 @@ using boost::asio::ip::tcp;
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(tcp::socket* socket)
-        : socket_(std::move(*socket)),
+    Session(tcp::socket* socket, config_options* options)
+        : options_(options),
+          socket_(std::move(*socket)),
           handler(nullptr),
           request(nullptr),
           response(new Response()) {}
@@ -39,6 +41,7 @@ private:
     void send_http();
     enum { max_length = 8192 };
     char data_[max_length];
+    config_options* options_;
     std::string to_send;
     tcp::socket socket_;
     std::string msg;

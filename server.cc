@@ -10,11 +10,13 @@
 
 #define DEFAULT_PORT 8080
 
-Server::Server(int port)
+Server::Server(config_options* options)
         : io_service_(),
-          acceptor_(io_service_, tcp::endpoint(tcp::v4(), port)),
+          options_(options),
+          acceptor_(io_service_, tcp::endpoint(tcp::v4(), options->port)),
           socket_(io_service_)
 {
+  int port = options->port;
   if ((0 < port) && (port < 65535))
     port_num = port;
   else 
@@ -37,7 +39,7 @@ void Server::do_accept()
     [this](boost::system::error_code ec)
     {
       if (!ec) {
-        std::make_shared<Session>(std::move(&socket_))->start();
+        std::make_shared<Session>(std::move(&socket_), options_)->start();
       }
 
       do_accept();
