@@ -12,7 +12,7 @@ class EchoHandlerTest : public ::testing::Test {
               		   std::map<std::string,std::string> stat) {
       request_ = new Request(request_string, echo, stat);
       response_ = new Response();
-      echo_handler handler_;
+      EchoHandler handler_;
       handler_.handle_request(request_, response_);
     }
 

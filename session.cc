@@ -1,7 +1,8 @@
 #include "session.h"
 #include "echo_handler.h"
-#include "request.h"
 #include "static_handler.h"
+#include "bad_request_handler.h"
+#include "request.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
@@ -23,11 +24,11 @@ void Session::do_read()
                     request = new Request(msg, options_->echo_path, options_->static_paths);
                     std::string request_type = request->GetType();
                     if (!request_type.compare("Echo")) {
-                      handler = new echo_handler();
+                      handler = new EchoHandler();
                     } else if (!request_type.compare( "Static")) {
                       handler = new StaticHandler();
                     } else {
-                      handler = new echo_handler();
+                      handler = new BadRequestHandler();
                     }
 
                     handler->handle_request(request, response);
