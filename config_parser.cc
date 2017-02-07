@@ -36,6 +36,20 @@ int NginxConfig::getPort() {
   return 0;
 }
 
+void NginxConfig::GetConfigOptions(config_options* options) {
+  int config_size = (unsigned long) statements_[0]->child_block_->statements_.size();
+  for (int i = 0; i < config_size; i++) {
+    std::shared_ptr<NginxConfigStatement> config_statement= statements_[0]->child_block_->statements_[i];
+    if (config_statement->tokens_[0] == "listen" && config_statement->tokens_.size() == 2) {
+       options->port = stoi(config_statement->tokens_[1]);
+    } else if (config_statement->tokens_[0] == "echo" && config_statement->tokens_.size() == 2) {
+       options->echo_path = config_statement->tokens_[1];
+    } else if (config_statement->tokens_[0] == "static" && config_statement->tokens_.size() == 3) {
+       options->static_paths[config_statement->tokens_[1]] = config_statement->tokens_[2];
+    }
+  }
+}
+
 std::string NginxConfigStatement::ToString(int depth) {
   std::string serialized_statement;
   for (int i = 0; i < depth; ++i) {

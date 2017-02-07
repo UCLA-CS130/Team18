@@ -4,6 +4,7 @@
 #include <memory>
 #include <string>
 #include <vector>
+#include "config_options.h"
 
 class NginxConfig;
 
@@ -21,6 +22,7 @@ class NginxConfig {
   std::string ToString(int depth = 0);
   std::vector<std::shared_ptr<NginxConfigStatement>> statements_;
   int getPort();
+  void GetConfigOptions(config_options* options);
 };
 
 // The driver that parses a config file and generates an NginxConfig.
