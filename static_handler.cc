@@ -76,6 +76,14 @@ std::string StaticHandler::GetContentType()
     return "text/html";
   else if (ext == JPG)
     return "image/jpeg";
+  else if (ext == GIF)
+    return "image/gif";
+  else if (ext == CSS)
+    return "text/css";
+  else if (ext == JS)
+    return "application/javascript";
+  else if (ext == JSON)
+    return "application/json";
   else
     return "text/plain";
 }
@@ -90,6 +98,14 @@ void StaticHandler::GetExtension(std::string uri)
   else if (!extension_string.compare("jpg") || 
               !extension_string.compare("jpeg"))
     ext = JPG;
+  else if (!extension_string.compare("css"))
+    ext = CSS;
+  else if (!extension_string.compare("js"))
+    ext = JS;
+  else if (!extension_string.compare("gif"))
+    ext = GIF;
+  else if (!extension_string.compare("json"))
+    ext = JSON;
   else 
     ext = TXT;
 }

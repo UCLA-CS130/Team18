@@ -1,0 +1,8 @@
+server {
+  listen   1024;
+  server_name foo.com;
+  root /home/ubuntu/sites/foo/;
+  Echo echo;
+  Static static static_src;
+  Static static2 /foo;  
+}
