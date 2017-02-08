@@ -7,7 +7,7 @@ import time
 if __name__ == "__main__":
     print "Starting integration test..."
     #create test config listening on port 12345
-    config_str ="server {\n  listen 12345;\n}"    
+    config_str ="server {\n  listen 12345;\n  Echo echo;\n  Static static static_src;\n}"    
     config_name = "temp_config"
     print "Creating temporary config file"
     with open(config_name, 'w') as f:
@@ -29,16 +29,16 @@ if __name__ == "__main__":
             conn = httplib.HTTPConnection("localhost", 12345)
             print "Connected to webserver"
             '''Format of Request:
-            GET / HTTP/1.1
+            GET /echo HTTP/1.1
             Host: localhost:12345
             User-Agent: arbitary-agent
             Content-Length: 0
             '''
-            request = "GET / HTTP/1.1\r\nHost: localhost:12345\r\n" + \
+            request = "GET /echo HTTP/1.1\r\nHost: localhost:12345\r\n" + \
                       "User-Agent: arbitrary-agent\r\n" + \
-                    "Content-Length: 0\r\n\r\n"
+                      "Content-Length: 0\r\n\r\n"
             print "Sending:\n" + request.strip() + "\n"
-            conn.putrequest("GET", "/", skip_accept_encoding=True)
+            conn.putrequest("GET", "/echo", skip_accept_encoding=True)
             conn.putheader("User-Agent", "arbitrary-agent")
             conn.putheader("Content-Length", "0")
             conn.endheaders()
