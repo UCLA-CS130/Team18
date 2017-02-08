@@ -20,7 +20,7 @@ bool Request::ParseRequestString(std::string request_string)
   std::string header;
   std::string status;
   std::string::size_type index;
-  std::string::size_type cr;
+  std::string::size_type cr; // carriage reutn location
   std::getline(resp, status);
   bool good_status = DecodeStatus(status); 
   if (!good_status)

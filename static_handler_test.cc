@@ -11,9 +11,10 @@
 
 class StaticHandlerTest : public ::testing::Test {
   protected:
-    void PrepareFile(std::string directory, std::string filename, 
-                    std::string filebody)
-    {
+    void PrepareFile(std::string directory, 
+                     std::string filename, 
+                     std::string filebody) 
+      {
       struct stat st = {0};
       std::string dir_str = "./" + directory;
       if (stat(dir_str.c_str(), &st) == -1) {
@@ -25,8 +26,9 @@ class StaticHandlerTest : public ::testing::Test {
       testfile.close();
     }
     void HandleRequest(std::string request_string,
-    				   std::string echo, 
-              		   std::map<std::string,std::string> stat) {
+                       std::string echo, 
+              	       std::map<std::string,std::string> stat) 
+    {
       request_ = new Request(request_string, echo, stat);
       response_ = new Response();
       StaticHandler* handler_ = new StaticHandler();
@@ -68,8 +70,7 @@ TEST_F(StaticHandlerTest, SimpleStaticRequest) {
 
 TEST_F(StaticHandlerTest, SimpleStaticImageRequest) {
   std::string dir_str = "test_dir";
-  PrepareFile(dir_str, "test.jpg", 
-  "JJJJJJJJJJ");
+  PrepareFile(dir_str, "test.jpg", "JJJJJJJJJJ");
   std::string request =
 		"GET /static/test.jpg HTTP/1.1\r\n\
 		Host: localhost:1024\r\n\

@@ -4,46 +4,43 @@
 
 class RequestTest : public ::testing::Test {
   protected:
-    std::string CreateRequestString(std::string method, std::string uri, 
-                            std::string version)
+    std::string CreateRequestString(std::string method, 
+                                    std::string uri, 
+                                    std::string version) 
     {
       std::string request_str = method + " " + uri + " " + "HTTP/" + version;
       request_str +=  "\r\nHost: localhost\r\n\r\n";
       return request_str;
     }
     
-    void SetFromString(std::string req_str)
-    {
+    void SetFromString(std::string req_str) {
       std::map<std::string,std::string> stat_map;
       stat_map.insert(std::make_pair("static", "src"));
       request = new Request(req_str, "echo", stat_map);       
     }
     
-    void SetNone(std::string method, std::string uri, std::string version)
-    {
+    void SetNone(std::string method, std::string uri, std::string version) {
       std::string req_str = CreateRequestString(method, uri, version);
       std::map<std::string,std::string> stat_map;
       stat_map.insert(std::make_pair("static", "src"));
       request = new Request(req_str, "echo", stat_map);
     }
 
-    void SetEcho(std::string echo_str)
-    {
+    void SetEcho(std::string echo_str) {
       std::string req_str = CreateRequestString("GET", "/" + echo_str, "1.1");
       std::map<std::string,std::string> stat_map;
       stat_map.insert(std::make_pair("static", "src"));
       request = new Request(req_str, echo_str, stat_map);
     }
 
-    void SetStatic(std::string stat_str, std::string file_str)
-    {
+    void SetStatic(std::string stat_str, std::string file_str) {
       std::string req_str = CreateRequestString("GET", "/" + stat_str, "1.1");
       std::map<std::string,std::string> stat_map;
       stat_map.insert(std::make_pair(stat_str,file_str));
       request = new Request(req_str, "echo", stat_map);
     }
     
-    void CleanUp() { delete request;}
+    void CleanUp() { delete request; }
 
     Request* request;	
 };
@@ -134,5 +131,4 @@ TEST_F(RequestTest, NoStatus) {
   EXPECT_FALSE(request->IsValid());
   CleanUp();
 }
-  
 
