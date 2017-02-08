@@ -14,7 +14,7 @@ class StaticHandler: public request_handler {
     virtual void handle_request(Request* req, Response* rep);
 
   private:
-    enum Extension {NOEXT, HTML, JPG, TXT} ext;
+    enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON} ext;
     void GetExtension(std::string uri);
     std::string GetContentType();
     void SetNotFound(Request* req, Response* res);
