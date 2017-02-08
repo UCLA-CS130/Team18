@@ -4,5 +4,5 @@ server {
   root /home/ubuntu/sites/foo/;
   Echo echo;
   Static static src;
-  Static static2 src2;  
+  Static static2 /foo;  
 }
