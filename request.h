@@ -3,39 +3,33 @@
 
 #include <stdlib.h>
 #include <string>
-#include <map>
+#include <vector>
+#include <memory>
 
 class Request {
   public:
-    Request(std::string request_string, std::string echo, 
-              std::map<std::string,std::string> stat);
-    std::string GetMethod();
-    std::string GetURI();
-    std::string GetVersion();
-    std::map<std::string,std::string> GetHeaders();
-    std::string GetHeader(std::string header_name);
-    std::string GetType();
-    std::string GetOriginalString();
-    std::string GetFilePath();
-    std::string GetStaticPath();
-    bool IsValid();
-    enum Type { NONE, ECHO_MODE, STAT_MODE };
+    static std::unique_ptr<Request> Parse(const std::string& raw_request)
+    {  return std::unique_ptr<Request>(new Request(raw_request)); }
+    std::string method() const;
+    std::string uri() const;
+    std::string version() const;
+    std::string raw_request() const;
+    
+    using Headers = std::vector<std::pair<std::string, std::string>>;
+    Headers headers() const;
+ 
+    std::string body() const;
  
   private:
-    std::string original_string;
-    std::string method;
-    std::string uri;
-    std::string http_version;
-    std::map<std::string, std::string> headers;
+    Request(std::string request_string); 
+    std::string original_string_;
+    std::string method_;
+    std::string uri_;
+    std::string http_version_;
+    std::string body_;
+    Headers headers_;
     bool ParseRequestString(std::string request_string);
     bool DecodeStatus(std::string status_line);
-    bool GetRequestType(std::string uri);
-    Request::Type message_type;
-    std::map<std::string,std::string> static_map;
-    std::string echo_string;
-    std::string static_path;
-    std::string file_path;
-    bool valid;
 };
 
 

@@ -2,16 +2,15 @@
 #include "request.h"
 #include <string>
 #include <sstream>
-#include <map>
+#include <vector>
+#include <memory>
+#include <iostream>
 
-Request::Request(std::string request_string, std::string echo, 
-                 std::map<std::string,std::string> stat)
-: static_map(stat)
+
+Request::Request(std::string request_string)
 {
-  echo_string = echo;
-  message_type = NONE;
-  original_string = request_string;
-  valid = ParseRequestString(request_string);
+  original_string_ = request_string;
+  ParseRequestString(request_string);
 }
 
 bool Request::ParseRequestString(std::string request_string)
@@ -29,9 +28,10 @@ bool Request::ParseRequestString(std::string request_string)
     index = header.find(':', 0);
     cr = header.find('\r', index);
     if (index != std::string::npos) {
-      headers.insert(std::make_pair(header.substr(0, index), header.substr(index+2, cr - (index + 2) )));
+      headers_.push_back(std::make_pair(header.substr(0, index), header.substr(index+2, cr - (index + 2) )));
     }
   }
+  body_ = request_string.substr(request_string.find("\r\n\r\n") + 4);
   return true; 
 }
 
@@ -43,82 +43,25 @@ bool Request::DecodeStatus(std::string status_line)
   back = status_line.find(' ');
   if (back == std::string::npos)
     return false;
-  method = status_line.substr(front, back - front);
+  method_ = status_line.substr(front, back - front);
   front = back + 1;
   
   back = status_line.find(' ', front);
   if (back == std::string::npos || back == front)
     return false;
-  uri = status_line.substr(front, back - front);
-  GetRequestType(uri);
+  uri_ = status_line.substr(front, back - front);
+
   front = back + 1;
 
   back = status_line.find('\r', front);
   if (back == std::string::npos || back == front)
     return false;
-  http_version = status_line.substr(front + 5, back - front-5);
+  http_version_ = status_line.substr(front + 5, back - front-5);
   return true;
 }
 
-std::string Request::GetHeader(std::string header_name)
-{
-  std::map<std::string, std::string>::iterator it;
-  it = headers.find(header_name);
-  if (it == headers.end())
-    return "";
-  else
-    return it->second;  
-}
-
-std::string Request::GetType()
-{
-  switch(message_type)
-  {
-    case NONE:
-      return "None";
-      break;
-    case ECHO_MODE:
-      return "Echo";
-      break;
-    case STAT_MODE:
-      return "Static";
-      break;
-    default:
-      return "None";
-  }
-}
-
-std::string Request::GetOriginalString() {
-  return original_string;
-}
-
-bool Request::GetRequestType(std::string uri)
-{
-  if (!uri.substr(1,echo_string.size()).compare(echo_string))
-    message_type = ECHO_MODE;
-  else {
-    for (std::map<std::string,std::string>::iterator it = static_map.begin();
-            it != static_map.end(); it++)
-    {
-       std::size_t slash = uri.find("/", 1);
-       if (!uri.substr(1, slash-1).compare(it->first))
-       {
-          message_type = STAT_MODE;
-          static_path = it->first;
-          file_path = it->second;
-          return true;
-       }
-    }
-    message_type = NONE;
-    return false;
-  }
-  return true;
-}
-
-bool Request::IsValid() { return valid; }
-std::string Request::GetMethod() { return method; }
-std::string Request::GetURI() { return uri; }
-std::string Request::GetVersion() { return http_version; }
-std::map<std::string,std::string> Request::GetHeaders() { return headers; }
-std::string Request::GetStaticPath() { return static_path; }
-std::string Request::GetFilePath() { return file_path; }
+std::string Request::method() const { return method_; }
+std::string Request::uri() const { return uri_; }
+std::string Request::version() const { return http_version_; }
+std::vector<std::pair<std::string, std::string>> Request::headers() const { return headers_; }
+std::string Request::body() const { return body_; }
