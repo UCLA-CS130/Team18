@@ -20,6 +20,7 @@ class StaticHandler: public RequestHandler {
     const bool GetRootPath(std::string& root_path, const NginxConfig& config);
     std::string root_path_;
     std::string uri_prefix_;
+    RequestHandler* not_found_handler_;
 };
 
 REGISTER_REQUEST_HANDLER(StaticHandler);

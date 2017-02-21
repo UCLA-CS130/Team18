@@ -14,6 +14,8 @@ StaticHandler::StaticHandler()
 RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
                                            const NginxConfig& config)
 {
+  not_found_handler_ = (RequestHandler::CreateByName("NotFoundHandler"));
+  not_found_handler_->Init("", config);
   uri_prefix_ = uri_prefix;
   std::string root_path;
   if (GetRootPath(root_path, config)) {
@@ -81,17 +83,7 @@ const bool StaticHandler::GetRootPath(std::string& root_path,
 
 void StaticHandler::SetNotFound(const Request& req, Response* res)
 {
-  res->SetStatus(Response::not_found);      
-  res->AddHeader("Content-Type", "text/plain");
-  std::string body = "Couldn't find that file";
-  std::string length;
-  std::ostringstream temp;
-  temp  <<  ((int) body.size());
-  length = temp.str();
-
-
-  res->AddHeader("Content-Length", length);
-  res->SetBody(body);
+  not_found_handler_->HandleRequest(req, res);
 }
 void StaticHandler::SetOk(const Request& req, Response* res, std::string file_body)
 {
