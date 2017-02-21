@@ -21,7 +21,7 @@ public:
   Server(NginxConfig* config, config_options* options);
   void start();
   void run();
-  short get_port() {return port_num;}
+  short get_port() { return port_num; }
 private:
   boost::asio::io_service io_service_;
   NginxConfig* config_;

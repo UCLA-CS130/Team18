@@ -7,20 +7,18 @@
 
 class BadRequestHandlerTest : public ::testing::Test {
   protected:
-    void HandleRequest(std::string request_string,
-    				   std::string echo, 
-              		   std::map<std::string,std::string> stat) {
-      request_ = new Request(request_string, echo, stat);
+    void HandleRequest(std::string request_string) {
+      request_ = Request::Parse(request_string);
       response_ = new Response();
       BadRequestHandler handler_;
-      handler_.handle_request(request_, response_);
+      handler_.HandleRequest(*request_, response_);
     }
 
     void CleanUp() {
-    	delete request_;
+    	request_.release();
     	delete response_;
     }
-    Request* request_;
+    std::unique_ptr<Request> request_;
     Response* response_;
 };
 
@@ -34,23 +32,10 @@ TEST_F(BadRequestHandlerTest, BadEchoRequest) {
 		Accept-Encoding: gzip, deflate\r\n\
 		Connection: keep-alive\r\n\
 		Upgrade-Insecure-Requests: 1\r\n\r\n";
-  std::map<std::string, std::string> static_options;
-  HandleRequest(request,"echo",static_options);
-  EXPECT_EQ("1.1", response_->http_version) << "Expected different HTTP Version";
-  EXPECT_EQ(Response::bad_request, response_->status) << "Expected different status";
-  EXPECT_EQ("0", response_->headers["Content-Length"]) << "Expected different Content-Length";
+  HandleRequest(request);
+  EXPECT_EQ("HTTP/1.1 400 Bad Request\r\nContent-Length: 47\r\n\r\n<html><body><h1>Bad Request!</h1></body></html>",
+            response_->ToString()) << "Expected different ToString";
 
   CleanUp();
 }
 
-TEST_F(BadRequestHandlerTest, DifferentHTTPVersionRequest) {
-  std::string request =
-		"GET /echo_different HTTP/1.0\r\n\r\n";
-  std::map<std::string, std::string> static_options;
-  HandleRequest(request,"echo",static_options);
-  EXPECT_EQ("1.0", response_->http_version) << "Expected different HTTP Version";
-  EXPECT_EQ(Response::bad_request, response_->status) << "Expected different status";
-  EXPECT_EQ("0", response_->headers["Content-Length"]) << "Expected different Content-Length";
-
-  CleanUp();
-}
