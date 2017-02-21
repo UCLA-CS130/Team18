@@ -6,18 +6,23 @@
 
 class Response {
   public:
-    std::string to_buffer();
-    std::string http_version;
-    enum status_type {
+    std::string ToString();
+    enum ResponseCode {
   	  ok = 200,
   	  bad_request = 400,
   	  not_found = 404
-    } status;
-    std::map<std::string, std::string> headers;
-    std::string body;
+    };
+    void SetStatus(const ResponseCode response_code);
+    void AddHeader(const std::string& header_name, const std::string& header_value);
+    void SetBody(const std::string& body);
+   
+    
   private:
     std::string get_header(std::string header);
-    std::string to_string(Response::status_type status);
+    std::string to_string(Response::ResponseCode status);
+    Response::ResponseCode status;
+    std::map<std::string,std::string> headers;
+    std::string response_body;
 };
 
 #endif
