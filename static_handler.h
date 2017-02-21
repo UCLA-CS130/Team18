@@ -15,10 +15,11 @@ class StaticHandler: public RequestHandler {
     enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON} ext;
     void GetExtension(std::string uri);
     std::string GetContentType();
-    void SetNotFound(Request* req, Response* res);
-    void SetOk(Request* req, Response* res, std::string file_body);
+    void SetNotFound(const Request& req, Response* res);
+    void SetOk(const Request& req, Response* res, std::string file_body);
     const bool GetRootPath(std::string& root_path, const NginxConfig& config);
     std::string root_path_;
+    std::string uri_prefix_;
 };
 
 REGISTER_REQUEST_HANDLER(StaticHandler);

@@ -14,6 +14,7 @@ StaticHandler::StaticHandler()
 RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
                                            const NginxConfig& config)
 {
+  uri_prefix_ = uri_prefix;
   std::string root_path;
   if (GetRootPath(root_path, config)) {
     root_path_ = root_path;
@@ -26,15 +27,12 @@ RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
 RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
                                                     Response* response)
 {  
-  /*
-  std::string static_path = request.GetStaticPath();
-  std::string file_path = request.GetFilePath();
   std::string request_uri = request.uri();
   GetExtension(request_uri);
   
-  std::string partial_file_path = request_uri.substr(static_path.size() + 2);
+  std::string partial_file_path = request_uri.substr(uri_prefix_.size() + 1);
   
-  std::string full_path = file_path + "/" + partial_file_path;
+  std::string full_path = root_path_ + "/" + partial_file_path;
 
 
   std::ifstream f(full_path.c_str(),std::ios::in|std::ios::binary|std::ios::ate);
@@ -47,13 +45,13 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
     f.close();
     std::string body(membuff, size);
     delete membuff;
-    SetOk(request, repsponse, body);
+    SetOk(request, response, body);
   }
   else
   {
-    SetNotFound(request, repsponse);
+    SetNotFound(request, response);
+    return RequestHandler::Status::ERROR;
   }
-  */
   return RequestHandler::Status::OK;
 }
 
@@ -70,7 +68,7 @@ const bool StaticHandler::GetRootPath(std::string& root_path,
   return false;
 }
 
-void StaticHandler::SetNotFound(Request* req, Response* res)
+void StaticHandler::SetNotFound(const Request& req, Response* res)
 {
   res->SetStatus(Response::not_found);      
   res->AddHeader("Content-Type", "text/plain");
@@ -84,7 +82,7 @@ void StaticHandler::SetNotFound(Request* req, Response* res)
   res->AddHeader("Content-Length", length);
   res->SetBody(body);
 }
-void StaticHandler::SetOk(Request* req, Response* res, std::string file_body)
+void StaticHandler::SetOk(const Request& req, Response* res, std::string file_body)
 {
   res->SetStatus(Response::ok);
   std::string content_type = GetContentType();      
