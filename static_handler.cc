@@ -1,6 +1,7 @@
 #include "static_handler.h"
 #include "request.h"
 #include "response.h"
+#include "config_parser.h"
 #include <string>
 #include <fstream>
 #include <sstream>
@@ -11,14 +12,21 @@ StaticHandler::StaticHandler()
 }
 
 RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
-                           const NginxConfig& config)
+                                           const NginxConfig& config)
 {
-  return RequestHandler::Status::OK;
+  std::string root_path;
+  if (GetRootPath(root_path, config)) {
+    root_path_ = root_path;
+    return RequestHandler::Status::OK;
+  } else {
+    return RequestHandler::Status::ERROR;
+  }
 }
 
 RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
-                                  Response* repsponse)
+                                                    Response* response)
 {  
+  /*
   std::string static_path = request.GetStaticPath();
   std::string file_path = request.GetFilePath();
   std::string request_uri = request.uri();
@@ -45,14 +53,27 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
   {
     SetNotFound(request, repsponse);
   }
+  */
   return RequestHandler::Status::OK;
+}
+
+const bool StaticHandler::GetRootPath(std::string& root_path,
+                                const NginxConfig& config)
+{
+  for (unsigned i = 0; i < (unsigned long) config.statements_.size(); i++) {
+    std::shared_ptr<NginxConfigStatement> config_statement = config.statements_[i];
+    if (config_statement->tokens_[0] == "root" && config_statement->tokens_.size() == 2) {
+      root_path = config_statement->tokens_[1];
+      return true;
+    }
+  }
+  return false;
 }
 
 void StaticHandler::SetNotFound(Request* req, Response* res)
 {
-  res->http_version = req->GetVersion();
-  res->status = Response::not_found;      
-  res->headers.insert(std::pair<std::string,std::string>("Content-Type", "text/plain"));
+  res->SetStatus(Response::not_found);      
+  res->AddHeader("Content-Type", "text/plain");
   std::string body = "Couldn't find that file";
   std::string length;
   std::ostringstream temp;
@@ -60,21 +81,20 @@ void StaticHandler::SetNotFound(Request* req, Response* res)
   length = temp.str();
 
 
-  res->headers.insert(std::pair<std::string,std::string>("Content-Length", length));
-  res->body = body;
+  res->AddHeader("Content-Length", length);
+  res->SetBody(body);
 }
 void StaticHandler::SetOk(Request* req, Response* res, std::string file_body)
 {
-  res->http_version = req->GetVersion();
-  res->status = Response::ok;
+  res->SetStatus(Response::ok);
   std::string content_type = GetContentType();      
-  res->headers.insert(std::pair<std::string,std::string>("Content-Type",content_type));
+  res->AddHeader("Content-Type", content_type);
   std::string length;
   std::ostringstream temp;
   temp  <<  ((int) file_body.size());
   length = temp.str();
-  res->headers.insert(std::pair<std::string,std::string>("Content-Length", length));
-  res->body = file_body;
+  res->AddHeader("Content-Length", length);
+  res->SetBody(file_body);
 }
 
 std::string StaticHandler::GetContentType()

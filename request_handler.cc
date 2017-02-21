@@ -1,4 +1,5 @@
 #include "request_handler.h"
+#include "config_parser.h"
 
 std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders = nullptr;
 

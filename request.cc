@@ -63,5 +63,6 @@ bool Request::DecodeStatus(std::string status_line)
 std::string Request::method() const { return method_; }
 std::string Request::uri() const { return uri_; }
 std::string Request::version() const { return http_version_; }
+std::string Request::raw_request() const { return original_string_; }
 std::vector<std::pair<std::string, std::string>> Request::headers() const { return headers_; }
 std::string Request::body() const { return body_; }

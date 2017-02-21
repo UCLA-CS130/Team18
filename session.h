@@ -13,13 +13,12 @@
 #include <cstdlib>
 #include <memory>
 #include <string>
-#include "echo_handler.h"
+#include "request_handler.h"
 #include "response.h"
-#include "static_handler.h"
-
-class Request;
 
 using boost::asio::ip::tcp;
+
+class NginxConfig;
 
 class Session : public std::enable_shared_from_this<Session>
 {
@@ -38,13 +37,12 @@ private:
     void send_http();
     enum { max_length = 8192 };
     char data_[max_length];
-    config_options* options_;
     std::string to_send;
     tcp::socket socket_;
     std::string msg;
-    std::vector<RequestHandler*> handlers_;
+    std::map<std::string, RequestHandler*> handlers_;
     RequestHandler* default_handler_;
-    Request* request;
+    std::unique_ptr<Request> request;
     Response* response;
 };
 

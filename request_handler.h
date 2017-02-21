@@ -4,9 +4,10 @@
 #include <map>
 #include <memory>
 #include <string>
-#include "config_parser.h"
 #include "request.h"
 #include "response.h"
+
+class NginxConfig;
 
 class RequestHandler {
   public:
@@ -15,10 +16,11 @@ class RequestHandler {
       ERROR = 1
 	  };
     static RequestHandler* CreateByName(const char* type);
+    virtual ~RequestHandler() {}
     virtual Status Init(const std::string& uri_prefix,
 						            const NginxConfig& config) = 0;
     virtual Status HandleRequest(const Request& request,
-    							               Response* repsponse) = 0;
+    							               Response* response) = 0;
 };
 
 extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
@@ -35,6 +37,7 @@ class RequestHandlerRegisterer {
     return new T;
   }
 };
+
 #define REGISTER_REQUEST_HANDLER(ClassName) \
   static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)
 

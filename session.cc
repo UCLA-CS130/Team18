@@ -1,13 +1,10 @@
 #include "session.h"
-#include "echo_handler.h"
-#include "static_handler.h"
-#include "bad_request_handler.h"
 #include "request.h"
+#include "config_parser.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <boost/bind.hpp>
-
 
 Session::Session(tcp::socket* socket, NginxConfig* config)
          : socket_(std::move(*socket)),
@@ -19,7 +16,11 @@ Session::Session(tcp::socket* socket, NginxConfig* config)
 
 Session::~Session()
 {
-  //TODO: Delete allocated objects 
+  for(std::map<std::string, RequestHandler*>::iterator it = handlers_.begin(); it != handlers_.end(); it++)
+  {
+    delete it->second;
+    handlers_.erase(it);
+  }
 }
 
 void Session::init_handlers(NginxConfig* config)
@@ -27,8 +28,9 @@ void Session::init_handlers(NginxConfig* config)
   for (unsigned i = 0; i < (unsigned long) config->statements_.size(); i++) {
     std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
     if (config_statement->tokens_[0] == "path" && config_statement->tokens_.size() == 3) {
-      handlers_.push_back(RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
-      handlers_.back()->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
+      std::string uri = config_statement->tokens_[1];
+      handlers_[uri] = (RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
+      handlers_[uri]->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
     } else if (config_statement->tokens_[0] == "default" && config_statement->tokens_.size() == 2) {
 
     }
@@ -46,13 +48,10 @@ void Session::do_read()
             {   if (reached_end)
                 {
                     std::cout << "REACHED END" << std::endl;
-                    request = new Request(msg, options_->echo_path, options_->static_paths);
-                    std::string request_type = request->GetType();
-
-                    //TODO: Get Appropriate Handler
-                    handlers_[0]->HandleRequest(*request, response);
+                    request = Request::Parse(msg);
+                    handlers_[request->uri()]->HandleRequest(*request, response);
                     send_http();
-                    delete request;
+                    request.release();
                     delete response;
                     msg = "";
                     response = new Response();
@@ -103,7 +102,7 @@ std::size_t Session::prepare_response(int status, std::string body)
 } 
 
 void Session::send_http() {
-    to_send = response->to_buffer();
+    to_send = response->ToString();
     do_write();
 }
 

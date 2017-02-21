@@ -9,7 +9,7 @@ class StaticHandler: public RequestHandler {
     virtual RequestHandler::Status Init(const std::string& uri_prefix,
                                         const NginxConfig& config);
     virtual RequestHandler::Status HandleRequest(const Request& request,
-    							                 Response* repsponse);
+    							                 Response* response);
 
   private:
     enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON} ext;
@@ -17,6 +17,8 @@ class StaticHandler: public RequestHandler {
     std::string GetContentType();
     void SetNotFound(Request* req, Response* res);
     void SetOk(Request* req, Response* res, std::string file_body);
+    const bool GetRootPath(std::string& root_path, const NginxConfig& config);
+    std::string root_path_;
 };
 
 REGISTER_REQUEST_HANDLER(StaticHandler);
