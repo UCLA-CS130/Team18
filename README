@@ -1,5 +1,109 @@
 CS130 Team 18 nginx server
+Michael Chen and Spencer Gervais
 
+Follows common API: https://github.com/UCLA-CS130/webserver-api
 Includes code from googletest-1.7.0. See https://code.google.com/p/googletest/
 Inspired by https://github.com/fatiherikli/nginxparser
 Uses Boost http://www.boost.org/
+
+
+
+HOW TO RUN THE SERVER
+How to build and run:
+"make" or "make webserver" to create executable "webserver"
+"./webserver <config_file>" where config file follows the syntax given below
+
+How to run unit tests:
+"make test" to run all unit tests and generate code coverage statistics
+
+How to run integration test:
+"make integration" starts a server, sends a request and confirms if the given response matches the expected response. Will exit 0 if successful, 1 if unsuccessful
+
+How to clean:
+"make clean"
+
+
+
+SOURCE CODE LAYOUT
+main.cc: Receives config file which includes port number.
+		 Ceate, start, and run Server
+
+server.h/cc: Create and start Session object
+
+session.h/cc: Create RequestHandlers specified in config file
+			  Wait for and read incoming requests
+			  HandleRequest with appropriate RequestHandler to generate proper response
+    		  Send response
+
+config_parser.h/cc: Parses the config file into NginxConfigStatements to find port numbers and RequestHandler configuration values
+
+request_handler.h/cc: Abstract base class for all RequestHandlers. (Follows common API)
+
+echo_handler.cc, static_handler.cc, bad_request_handler.cc, not_found_handler.cc:
+	Inherit from RequestHandler. Implement virtual functions Init and HandleRequest
+
+response.h/cc: Defines Response object (Follows common API)
+
+request.h/cc: Defines Request object (Follows common API)
+
+build_tests.sh: Script to run tests in each individual *_test.cc file (includes gcov)
+integration_test.py: Script for integration test
+
+
+
+CONFIG FILE SYNTAX
+Current RequestHandlers available: BadRequestHandler, NotFoundHandler, EchoHandler, StaticHandler
+
+Example:
+# This is a comment
+port <port_number>; #Specify on which port number to run the server
+
+path /<URI> <RequestHandler> {
+	root <file_path>; #Only for StaticHandler, specify for which path to find files
+} 
+
+default <RequestHandler> {} #Default response handler if no handlers match.
+
+
+
+CODING STYLE BASICS
+Contact owners Michael Chen or Spencer Gervais for questions on coding style not answered below
+
+Indentation: Two space
+File name: example_file_name.cc
+Test file name: example_file_name_test.cc
+ifndef: #ifndef EXAMPLE_IFNDEF_NAME
+Do not "using namespace std;"
+
+Example
+Define new RequestHandler:
+	#ifndef NEW_HANDLER
+	#define NEW_HANDLER
+
+	#include "request_handler.h"
+	#include "request.h"
+	#include "response.h"
+	class NewHandler : public RequestHandler {
+	  public:
+	    NewHandler() {}
+	    virtual RequestHandler::Status Init(const std::string& uri_prefix,
+	                                        const NginxConfig& config);
+        virtual RequestHandler::Status HandleRequest(const Request& request,
+                                                     Response* repsponse);
+
+	};
+
+Implement new RequestHandler:
+	#include "new_handler.h"
+	
+	RequestHandler::Status NewHandler::Init(const std::string& uri_prefix,
+                                            const NginxConfig& config)
+	{
+	  //Source Code
+	}
+
+	RequestHandler::Status NewHandler::HandleRequest(const Request& request,
+                                                     Response* response)
+	{
+	  //Source Code
+	}
