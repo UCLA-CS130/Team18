@@ -28,8 +28,7 @@ std::string Response::get_header(std::string header) {
   	formatted_header = "Content-Type: " + header_value + "\r\n";
   } else if (header == "Content-Length") {
  	formatted_header = "Content-Length: " + header_value + "\r\n";
-  }
-  else {
+  } else {
         formatted_header = header + ": " + header_value + "\r\n";
   }
 
@@ -49,17 +48,14 @@ std::string Response::to_string(Response::ResponseCode status) {
   }
 }
 
-void Response::SetStatus(const Response::ResponseCode response_code) 
-{ 
+void Response::SetStatus(const Response::ResponseCode response_code) { 
   status = response_code; 
 }
 void Response::AddHeader(const std::string& header_name, 
-                        const std::string& header_value) 
-{ 
+                        const std::string& header_value) { 
   headers.insert(std::make_pair(header_name, header_value));
 }
-void Response::SetBody(const std::string& body) 
-{
+void Response::SetBody(const std::string& body) {
   response_body = body; 
 } 
    
