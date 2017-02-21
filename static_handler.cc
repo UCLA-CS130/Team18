@@ -30,7 +30,18 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
   std::string request_uri = request.uri();
   GetExtension(request_uri);
   
-  std::string partial_file_path = request_uri.substr(uri_prefix_.size() + 1);
+  size_t file_prefix_size = uri_prefix_.size() + 1;
+  if (!uri_prefix_.compare("/"))
+  {
+    file_prefix_size = 1;
+  }
+
+  if (request_uri.size() <= file_prefix_size)
+  {
+    SetNotFound(request, response);
+    return RequestHandler::Status::NOT_FOUND;
+  }
+  std::string partial_file_path = request_uri.substr(file_prefix_size);
   
   std::string full_path = root_path_ + "/" + partial_file_path;
 
