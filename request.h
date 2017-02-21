@@ -9,7 +9,13 @@
 class Request {
   public:
     static std::unique_ptr<Request> Parse(const std::string& raw_request)
-    {  return std::unique_ptr<Request>(new Request(raw_request)); }
+    { 
+      std::unique_ptr<Request> req(new Request(raw_request));
+      if (req->valid_)
+        return req;
+      else
+        return std::unique_ptr<Request>(nullptr);
+    }
     std::string method() const;
     std::string uri() const;
     std::string version() const;
@@ -30,6 +36,7 @@ class Request {
     Headers headers_;
     bool ParseRequestString(std::string request_string);
     bool DecodeStatus(std::string status_line);
+    bool valid_;
 };
 
 
