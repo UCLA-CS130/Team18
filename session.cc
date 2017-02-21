@@ -8,7 +8,32 @@
 #include <iostream>
 #include <boost/bind.hpp>
 
-Session::~Session() { delete handler; delete request; delete response; }
+
+Session::Session(tcp::socket* socket, NginxConfig* config)
+         : socket_(std::move(*socket)),
+           request(nullptr),
+           response(new Response())
+{
+  init_handlers(config);
+}
+
+Session::~Session()
+{
+  //TODO: Delete allocated objects 
+}
+
+void Session::init_handlers(NginxConfig* config)
+{
+  for (unsigned i = 0; i < (unsigned long) config->statements_.size(); i++) {
+    std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
+    if (config_statement->tokens_[0] == "path" && config_statement->tokens_.size() == 3) {
+      handlers_.push_back(RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
+      handlers_.back()->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
+    } else if (config_statement->tokens_[0] == "default" && config_statement->tokens_.size() == 2) {
+
+    }
+  }
+}
 
 void Session::do_read()
 {
@@ -23,19 +48,12 @@ void Session::do_read()
                     std::cout << "REACHED END" << std::endl;
                     request = new Request(msg, options_->echo_path, options_->static_paths);
                     std::string request_type = request->GetType();
-                    if (!request_type.compare("Echo")) {
-                      handler = new EchoHandler();
-                    } else if (!request_type.compare( "Static")) {
-                      handler = new StaticHandler();
-                    } else {
-                      handler = new BadRequestHandler();
-                    }
 
-                    handler->handle_request(request, response);
+                    //TODO: Get Appropriate Handler
+                    handlers_[0]->HandleRequest(*request, response);
                     send_http();
                     delete request;
                     delete response;
-                    delete handler;
                     msg = "";
                     response = new Response();
                 }

@@ -5,10 +5,13 @@
 #include "request.h"
 #include "response.h"
 
-class BadRequestHandler : public request_handler {
+class BadRequestHandler : public RequestHandler {
   public:
     BadRequestHandler() {}
-    void handle_request(Request* req, Response* rep);
+    virtual RequestHandler::Status Init(const std::string& uri_prefix,
+						const NginxConfig& config);
+    virtual RequestHandler::Status HandleRequest(const Request& request,
+    							 Response* repsponse);
 };
 
 #endif

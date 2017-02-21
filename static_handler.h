@@ -2,16 +2,14 @@
 #define STATIC_HANDLER
 
 #include "request_handler.h"
-#include <string>
-#include <map>
-class Request;
-class Response;
 
-
-class StaticHandler: public request_handler {
+class StaticHandler: public RequestHandler {
   public:
     StaticHandler();
-    virtual void handle_request(Request* req, Response* rep);
+    virtual RequestHandler::Status Init(const std::string& uri_prefix,
+                                        const NginxConfig& config);
+    virtual RequestHandler::Status HandleRequest(const Request& request,
+    							                 Response* repsponse);
 
   private:
     enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON} ext;
@@ -20,5 +18,7 @@ class StaticHandler: public request_handler {
     void SetNotFound(Request* req, Response* res);
     void SetOk(Request* req, Response* res, std::string file_body);
 };
+
+REGISTER_REQUEST_HANDLER(StaticHandler);
 
 #endif

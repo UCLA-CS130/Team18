@@ -18,7 +18,7 @@ int main(int argc, char* argv[]) {
     config_options* options = new config_options();
     config.GetConfigOptions(options);
     if (options->port) {
-      Server s(options);
+      Server s(&config, options);
       s.start();
       s.run();
     } else {

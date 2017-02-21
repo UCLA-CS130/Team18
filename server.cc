@@ -10,9 +10,9 @@
 
 #define DEFAULT_PORT 8080
 
-Server::Server(config_options* options)
+Server::Server(NginxConfig* config, config_options* options)
         : io_service_(),
-          options_(options),
+          config_(config),
           acceptor_(io_service_, tcp::endpoint(tcp::v4(), options->port)),
           socket_(io_service_)
 {
@@ -39,7 +39,7 @@ void Server::do_accept()
     [this](boost::system::error_code ec)
     {
       if (!ec) {
-        std::make_shared<Session>(std::move(&socket_), options_)->start();
+        std::make_shared<Session>(std::move(&socket_), config_)->start();
       }
 
       do_accept();

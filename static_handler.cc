@@ -10,11 +10,18 @@ StaticHandler::StaticHandler()
   ext = NOEXT; 
 }
 
-void StaticHandler::handle_request(Request* req, Response* rep)
+RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
+                           const NginxConfig& config)
+{
+  return RequestHandler::Status::OK;
+}
+
+RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
+                                  Response* repsponse)
 {  
-  std::string static_path = req->GetStaticPath();
-  std::string file_path = req->GetFilePath();
-  std::string request_uri = req->GetURI();
+  std::string static_path = request.GetStaticPath();
+  std::string file_path = request.GetFilePath();
+  std::string request_uri = request.GetURI();
   GetExtension(request_uri);
   
   std::string partial_file_path = request_uri.substr(static_path.size() + 2);
@@ -32,13 +39,13 @@ void StaticHandler::handle_request(Request* req, Response* rep)
     f.close();
     std::string body(membuff, size);
     delete membuff;
-    SetOk(req, rep, body);
+    SetOk(request, repsponse, body);
   }
   else
   {
-    SetNotFound(req, rep);
+    SetNotFound(request, repsponse);
   }
-
+  return RequestHandler::Status::OK;
 }
 
 void StaticHandler::SetNotFound(Request* req, Response* res)

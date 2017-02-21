@@ -1,14 +1,41 @@
 #ifndef REQUEST_HANDLER
 #define REQUEST_HANDLER
 
-class Request;
-class Response;
+#include <map>
+#include <memory>
+#include <string>
+#include "config_parser.h"
+#include "request.h"
+#include "response.h"
 
-class request_handler {
+class RequestHandler {
   public:
-    request_handler() {}
-    virtual ~request_handler() {}
-    virtual void handle_request(Request* req, Response* rep) = 0;
+  	enum Status {
+      OK = 0,
+      ERROR = 1
+	  };
+    static RequestHandler* CreateByName(const char* type);
+    virtual Status Init(const std::string& uri_prefix,
+						            const NginxConfig& config) = 0;
+    virtual Status HandleRequest(const Request& request,
+    							               Response* repsponse) = 0;
 };
+
+extern std::map<std::string, RequestHandler* (*)(void)>* request_handler_builders;
+template<typename T>
+class RequestHandlerRegisterer {
+ public:
+  RequestHandlerRegisterer(const std::string& type) {
+    if (request_handler_builders == nullptr) {
+      request_handler_builders = new std::map<std::string, RequestHandler* (*)(void)>;
+    }
+    (*request_handler_builders)[type] = RequestHandlerRegisterer::Create;
+  }
+  static RequestHandler* Create() {
+    return new T;
+  }
+};
+#define REGISTER_REQUEST_HANDLER(ClassName) \
+  static RequestHandlerRegisterer<ClassName> ClassName##__registerer(#ClassName)
 
 #endif
