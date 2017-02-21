@@ -21,7 +21,7 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
 {  
   std::string static_path = request.GetStaticPath();
   std::string file_path = request.GetFilePath();
-  std::string request_uri = request.GetURI();
+  std::string request_uri = request.uri();
   GetExtension(request_uri);
   
   std::string partial_file_path = request_uri.substr(static_path.size() + 2);
