@@ -7,8 +7,10 @@
 #include <iostream>
 #include <boost/bind.hpp>
 
-Session::Session(tcp::socket* socket, NginxConfig* config)
-         : socket_(std::move(*socket)),
+using boost::asio::ip::tcp;
+
+Session::Session(boost::asio::io_service& io_service, NginxConfig* config)
+         : socket_(io_service),
            request(nullptr),
            response(new Response())
 {
@@ -23,6 +25,8 @@ Session::~Session()
     handlers_.erase(it);
   }
 }
+
+tcp::socket& Session::Socket() { return socket_; }
 
 void Session::init_handlers(NginxConfig* config)
 {

@@ -19,7 +19,7 @@ int main(int argc, char* argv[]) {
     config.GetConfigOptions(options);
     if (options->port) {
       Server s(&config, options);
-      s.start();
+//      s.start();
       s.run();
     } else {
       std::cerr << "Invalid port number " << "\n";
