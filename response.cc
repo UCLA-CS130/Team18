@@ -8,14 +8,14 @@ namespace status_strings {
   const std::string not_found = "404 Not Found\r\n";
 }
 
-std::string Response::to_buffer() {
-  std::string response_msg = "HTTP/" +  http_version + " " + to_string(status);
+std::string Response::ToString() {
+  std::string response_msg = "HTTP/1.1 "  + to_string(status);
   std::map<std::string, std::string>::iterator it;
   for (it = headers.begin(); it != headers.end(); it++) {
     response_msg += get_header(it->first);
   }
   response_msg += "\r\n";
-  response_msg += body;
+  response_msg += response_body;
 
   return response_msg;
 }
@@ -28,12 +28,14 @@ std::string Response::get_header(std::string header) {
   	formatted_header = "Content-Type: " + header_value + "\r\n";
   } else if (header == "Content-Length") {
  	formatted_header = "Content-Length: " + header_value + "\r\n";
+  } else {
+        formatted_header = header + ": " + header_value + "\r\n";
   }
 
   return formatted_header;
 }
 
-std::string Response::to_string(Response::status_type status) {
+std::string Response::to_string(Response::ResponseCode status) {
   switch (status) {
     case Response::ok:
       return status_strings::ok;
@@ -45,3 +47,15 @@ std::string Response::to_string(Response::status_type status) {
       return status_strings::bad_request;
   }
 }
+
+void Response::SetStatus(const Response::ResponseCode response_code) { 
+  status = response_code; 
+}
+void Response::AddHeader(const std::string& header_name, 
+                        const std::string& header_value) { 
+  headers.insert(std::make_pair(header_name, header_value));
+}
+void Response::SetBody(const std::string& body) {
+  response_body = body; 
+} 
+   
