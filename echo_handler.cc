@@ -1,13 +1,13 @@
 #include "echo_handler.h"
 
 RequestHandler::Status EchoHandler::Init(const std::string& uri_prefix,
-                         				 const NginxConfig& config)
+                                         const NginxConfig& config)
 {
   return RequestHandler::Status::OK;
 }
 
 RequestHandler::Status EchoHandler::HandleRequest(const Request& request,
-    											  Response* response)
+                                                  Response* response)
 {
   response->SetStatus(Response::ok);
   response->AddHeader("Content-Type", "text/plain");
