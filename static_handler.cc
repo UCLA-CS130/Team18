@@ -20,7 +20,7 @@ RequestHandler::Status StaticHandler::Init(const std::string& uri_prefix,
     root_path_ = root_path;
     return RequestHandler::Status::OK;
   } else {
-    return RequestHandler::Status::ERROR;
+    return RequestHandler::Status::BAD_REQUEST;
   }
 }
 
@@ -50,7 +50,7 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
   else
   {
     SetNotFound(request, response);
-    return RequestHandler::Status::ERROR;
+    return RequestHandler::Status::NOT_FOUND;
   }
   return RequestHandler::Status::OK;
 }

@@ -9,9 +9,9 @@ class BadRequestHandler : public RequestHandler {
   public:
     BadRequestHandler() {}
     virtual RequestHandler::Status Init(const std::string& uri_prefix,
-				        const NginxConfig& config);
+                                        const NginxConfig& config);
     virtual RequestHandler::Status HandleRequest(const Request& request,
-					         Response* repsponse);
+                                                 Response* response);
 };
 
 REGISTER_REQUEST_HANDLER(BadRequestHandler);

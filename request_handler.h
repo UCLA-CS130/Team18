@@ -12,8 +12,9 @@ class NginxConfig;
 class RequestHandler {
   public:
   	enum Status {
-      OK = 0,
-      ERROR = 1
+      OK = 200,
+      BAD_REQUEST = 400,
+      NOT_FOUND = 404
 	  };
     static RequestHandler* CreateByName(const char* type);
     virtual ~RequestHandler() {}

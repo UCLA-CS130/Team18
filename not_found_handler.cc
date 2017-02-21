@@ -15,5 +15,5 @@ RequestHandler::Status NotFoundHandler::HandleRequest(const Request& request,
   response->SetStatus(Response::not_found);
   response->AddHeader("Content-Length", content_length);
   response->SetBody(not_found_page);
-  return RequestHandler::Status::OK;
+  return RequestHandler::Status::NOT_FOUND;
 }

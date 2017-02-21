@@ -15,5 +15,5 @@ RequestHandler::Status BadRequestHandler::HandleRequest(const Request& request,
   response->SetStatus(Response::bad_request);
   response->AddHeader("Content-Length", content_length);
   response->SetBody(bad_request_page);
-  return RequestHandler::Status::OK;
+  return RequestHandler::Status::BAD_REQUEST;
 }
