@@ -23,6 +23,8 @@ case `uname` in
     ./not_found_handler_test && gcov -r not_found_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage status_handler_test.cc request_handler.cc request_handler_stats.cc status_handler.cc response.cc request.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o status_handler_test
     ./status_handler_test && gcov -r status_handler.cc
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage request_handler_stats_test.cc request_handler.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_handler_stats_test
+    ./request_handler_stats_test && gcov -r request_handler_stats.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
     ./config_parser_test && gcov -r config_parser.cc;;
   Darwin)

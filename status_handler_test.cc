@@ -23,7 +23,7 @@ class StatusHandlerTest : public ::testing::Test {
     Response* response_;
 };
 
-TEST_F(StatusHandlerTest, BadEchoRequest) {
+TEST_F(StatusHandlerTest, StatusRequest) {
   std::string request =
 		"GET /status HTTP/1.1\r\n\
 		Host: localhost:1024\r\n\
