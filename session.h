@@ -8,27 +8,22 @@
 #ifndef SESSION
 #define SESSION
 
+#include <array>
 #include <boost/asio.hpp>
 #include <cstdlib>
-#include <array>
+#include <memory>
 #include <string>
-#include "response.h"
 #include "request_handler.h"
-#include "config_options.h"
-
-class Request;
+#include "response.h"
 
 using boost::asio::ip::tcp;
+
+class NginxConfig;
 
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(tcp::socket* socket, config_options* options)
-        : options_(options),
-          socket_(std::move(*socket)),
-          handler(nullptr),
-          request(nullptr),
-          response(new Response()) {}
+    Session(tcp::socket* socket, NginxConfig* config);
     ~Session();
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
@@ -36,20 +31,19 @@ public:
     std::string OutputToString();
 
 private:
+    void init_handlers(NginxConfig* config);
     void do_read();
     void do_write();
     void send_http();
     enum { max_length = 8192 };
     char data_[max_length];
-    config_options* options_;
     std::string to_send;
     tcp::socket socket_;
     std::string msg;
-    request_handler* handler;
-    Request* request;
+    std::map<std::string, RequestHandler*> handlers_;
+    RequestHandler* default_handler_;
+    std::unique_ptr<Request> request;
     Response* response;
 };
-
-
 
 #endif

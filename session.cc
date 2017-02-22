@@ -1,14 +1,42 @@
 #include "session.h"
-#include "echo_handler.h"
-#include "static_handler.h"
-#include "bad_request_handler.h"
 #include "request.h"
+#include "config_parser.h"
 #include <cstdlib>
 #include <string>
 #include <iostream>
 #include <boost/bind.hpp>
 
-Session::~Session() { delete handler; delete request; delete response; }
+Session::Session(tcp::socket* socket, NginxConfig* config)
+         : socket_(std::move(*socket)),
+           request(nullptr),
+           response(new Response())
+{
+  init_handlers(config);
+}
+
+Session::~Session()
+{
+  for(std::map<std::string, RequestHandler*>::iterator it = handlers_.begin(); it != handlers_.end(); it++)
+  {
+    delete it->second;
+    handlers_.erase(it);
+  }
+}
+
+void Session::init_handlers(NginxConfig* config)
+{
+  for (unsigned i = 0; i < (unsigned long) config->statements_.size(); i++) {
+    std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
+    if (config_statement->tokens_[0] == "path" && config_statement->tokens_.size() == 3) {
+      std::string uri = config_statement->tokens_[1];
+      handlers_[uri] = (RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
+      handlers_[uri]->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
+    } else if (config_statement->tokens_[0] == "default" && config_statement->tokens_.size() == 2) {
+      default_handler_ = (RequestHandler::CreateByName(config_statement->tokens_[1].c_str()));
+      default_handler_->Init("", *config_statement->child_block_.get());
+    }
+  }
+}
 
 void Session::do_read()
 {
@@ -21,21 +49,26 @@ void Session::do_read()
             {   if (reached_end)
                 {
                     std::cout << "REACHED END" << std::endl;
-                    request = new Request(msg, options_->echo_path, options_->static_paths);
-                    std::string request_type = request->GetType();
-                    if (!request_type.compare("Echo")) {
-                      handler = new EchoHandler();
-                    } else if (!request_type.compare( "Static")) {
-                      handler = new StaticHandler();
-                    } else {
-                      handler = new BadRequestHandler();
+                    request = Request::Parse(msg);
+                    
+                    std::string matching_string = "";
+                    for (std::map<std::string, RequestHandler*>::iterator it =
+                         handlers_.begin(); it != handlers_.end(); it++) {
+                      if (request->uri().find(it->first) == 0) {
+                        if (it->first.size() > matching_string.size())
+                          matching_string = it->first;
+                      }
                     }
-
-                    handler->handle_request(request, response);
+                    
+                    if (matching_string.empty())
+                      default_handler_->HandleRequest(*request, response);
+                    else
+                      handlers_[matching_string]->HandleRequest(*request, response);      
+                    
+                    //handlers_[request->uri()]->HandleRequest(*request, response);
                     send_http();
-                    delete request;
+                    request.release();
                     delete response;
-                    delete handler;
                     msg = "";
                     response = new Response();
                 }
@@ -85,7 +118,7 @@ std::size_t Session::prepare_response(int status, std::string body)
 } 
 
 void Session::send_http() {
-    to_send = response->to_buffer();
+    to_send = response->ToString();
     do_write();
 }
 

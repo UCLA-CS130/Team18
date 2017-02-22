@@ -1,16 +1,17 @@
 #include "gtest/gtest.h"
-#include "echo_handler.h"
+#include "status_handler.h"
+#include "request_handler_stats.h"
 #include "request.h"
 #include "response.h"
 #include <string>
 #include <map>
 
-class EchoHandlerTest : public ::testing::Test {
+class StatusHandlerTest : public ::testing::Test {
   protected:
     void HandleRequest(std::string request_string) {
       request_ = Request::Parse(request_string);
       response_ = new Response();
-      EchoHandler handler_;
+      StatusHandler handler_;
       handler_.HandleRequest(*request_, response_);
     }
 
@@ -22,9 +23,9 @@ class EchoHandlerTest : public ::testing::Test {
     Response* response_;
 };
 
-TEST_F(EchoHandlerTest, SimpleEchoRequest) {
+TEST_F(StatusHandlerTest, BadEchoRequest) {
   std::string request =
-		"GET /echo HTTP/1.1\r\n\
+		"GET /status HTTP/1.1\r\n\
 		Host: localhost:1024\r\n\
 		User-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0\r\n\
 		Accept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n\
@@ -33,8 +34,9 @@ TEST_F(EchoHandlerTest, SimpleEchoRequest) {
 		Connection: keep-alive\r\n\
 		Upgrade-Insecure-Requests: 1\r\n\r\n";
   HandleRequest(request);
-  EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Length: 340\r\nContent-Type: text/plain\r\n\r\nGET /echo HTTP/1.1\r\n\t\tHost: localhost:1024\r\n\t\tUser-Agent: Mozilla/5.0 (X11; Ubuntu; Linux x86_64; rv:51.0) Gecko/20100101 Firefox/51.0\r\n\t\tAccept: text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8\r\n\t\tAccept-Language: en-US,en;q=0.5\r\n\t\tAccept-Encoding: gzip, deflate\r\n\t\tConnection: keep-alive\r\n\t\tUpgrade-Insecure-Requests: 1\r\n\r\n",
+  EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Length: 227\r\n\r\n<html><p>Default Handler: Default Handler not specified</p><table><tr><th>Request Handler</th><th>URL Prefix</th></tr></table><p>Number of Requests: 0</p><table><tr><th>URL Request</th><th>Response Code</th></tr></table></html>",
             response_->ToString()) << "Expected different ToString";
 
   CleanUp();
 }
+

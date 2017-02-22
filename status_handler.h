@@ -1,19 +1,23 @@
-#ifndef BAD_REQUEST_HANDLER
-#define BAD_REQUEST_HANDLER
+#ifndef STATUS_HANDLER
+#define STATUS_HANDLER
 
 #include "request_handler.h"
 #include "request.h"
 #include "response.h"
 
-class BadRequestHandler : public RequestHandler {
+class StatusHandler : public RequestHandler {
   public:
-    BadRequestHandler() {}
+    StatusHandler() {}
     virtual RequestHandler::Status Init(const std::string& uri_prefix,
                                         const NginxConfig& config);
     virtual RequestHandler::Status HandleRequest(const Request& request,
                                                  Response* response);
+  private:
+    std::string GetDefaultHTML();
+    std::string GetRequestHandlerHTML();
+    std::string GetURLRequestsHTML();
 };
 
-REGISTER_REQUEST_HANDLER(BadRequestHandler);
+REGISTER_REQUEST_HANDLER(StatusHandler);
 
 #endif

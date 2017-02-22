@@ -2,13 +2,15 @@
 #define ECHO_HANDLER
 
 #include "request_handler.h"
-#include "request.h"
-#include "response.h"
 
-class EchoHandler : public request_handler {
+class EchoHandler : public RequestHandler {
   public:
-    EchoHandler() {}
-    void handle_request(Request* req, Response* rep);
+    virtual RequestHandler::Status Init(const std::string& uri_prefix,
+                                        const NginxConfig& config);
+    virtual RequestHandler::Status HandleRequest(const Request& request,
+                                                 Response* response);
 };
+
+REGISTER_REQUEST_HANDLER(EchoHandler);
 
 #endif

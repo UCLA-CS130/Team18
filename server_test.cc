@@ -1,4 +1,5 @@
 #include "gtest/gtest.h"
+#include "config_parser.h"
 #include "server.h"
 #include <boost/asio.hpp>
 
@@ -9,13 +10,14 @@ class ServerTest : public ::testing::Test {
     int CreateServerGetPort(int port) {
       options_ = new config_options();
       options_->port = port;
-      Server server_(options_);
+      Server server_(config_, options_);
       return server_.get_port();
     }
     void CleanUp() {
       delete options_;
     }
 
+    NginxConfig* config_;
     config_options* options_;
 };
 
