@@ -24,6 +24,7 @@ class SessionInputTest : public ::testing::Test {
     std::string GetOutput(std::string str, int status_code) {
       boost::asio::io_service io_service;
       tcp::socket socket(io_service);
+      config_ = new NginxConfig();
       Session s(&socket, config_);
       std::size_t length = s.prepare_response(status_code, str);
       return s.OutputToString();

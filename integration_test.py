@@ -7,7 +7,7 @@ import time
 if __name__ == "__main__":
     print "Starting integration test..."
     #create test config listening on port 12345
-    config_str ="server {\n  listen 12345;\n  Echo echo;\n  Static static static_src;\n}"    
+    config_str ="port 12345;\n\npath /echo EchoHandler {}\n\npath /static StaticHandler {\n  root static_src;\n}\n\ndefault NotFoundHandler {}"
     config_name = "temp_config"
     print "Creating temporary config file"
     with open(config_name, 'w') as f:
