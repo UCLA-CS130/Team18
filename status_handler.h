@@ -12,6 +12,10 @@ class StatusHandler : public RequestHandler {
                                         const NginxConfig& config);
     virtual RequestHandler::Status HandleRequest(const Request& request,
                                                  Response* response);
+  private:
+    std::string GetDefaultHTML();
+    std::string GetRequestHandlerHTML();
+    std::string GetURLRequestsHTML();
 };
 
 REGISTER_REQUEST_HANDLER(StatusHandler);
