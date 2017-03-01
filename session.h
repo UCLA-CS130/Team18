@@ -10,12 +10,12 @@
 
 #include <array>
 #include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <cstdlib>
 #include <memory>
 #include <string>
 #include "request_handler.h"
 #include "response.h"
-#include <boost/enable_shared_from_this.hpp>
 
 using boost::asio::ip::tcp;
 
@@ -30,7 +30,7 @@ public:
     bool check_input(std::size_t length, char* buffer);
     std::size_t prepare_response(int status, std::string body);
     std::string OutputToString();
-    tcp::socket& Socket();
+    tcp::socket& Socket() { return socket_; }
 private:
     void init_handlers(NginxConfig* config);
     void do_read();

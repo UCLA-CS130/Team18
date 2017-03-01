@@ -7,9 +7,9 @@
 
 #include "server.h"
 #include "session.h"
+#include "boost/asio.hpp"
 #include "boost/thread.hpp"
 #include <vector>
-#include "boost/asio.hpp"
 #include <memory>
 
 using boost::asio::ip::tcp;
@@ -20,8 +20,7 @@ Server::Server(NginxConfig* config, config_options* options)
         : io_service_(),
           config_(config),
           acceptor_(io_service_, tcp::endpoint(tcp::v4(), options->port)),
-          socket_(io_service_),
-          new_connection_()
+          socket_(io_service_)
 {
   int port = options->port;
   if ((0 < port) && (port < 65535))
@@ -41,21 +40,17 @@ void Server::start()
 
 void Server::run()
 {
-  //io_service_.run();
   std::vector<boost::shared_ptr<boost::thread> > threads;
-  for (std::size_t i = 0; i < 10; ++i)
-  {
+  for (std::size_t i = 0; i < 10; ++i) {
     boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, &io_service_)));
     threads.push_back(thread);
   }
 
-  for (std::size_t i = 0; i < threads.size(); ++i)
-  {
+  for (std::size_t i = 0; i < threads.size(); ++i) {
     threads[i]->join();
   }
 
 }
-
 
 void Server::do_accept()
 {
