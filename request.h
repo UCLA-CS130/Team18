@@ -28,6 +28,8 @@ class Request {
     void SetVersion(const std::string& version) { http_version_ = version; }
     std::string raw_request() const;
     
+    std::string ToString() const;
+
     Headers headers() const;
     
     std::string body() const;

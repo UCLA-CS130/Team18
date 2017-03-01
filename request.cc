@@ -5,7 +5,7 @@
 #include <vector>
 #include <memory>
 #include <iostream>
-
+#include <map>
 
 Request::Request(const std::string& request_string)
 {
@@ -66,3 +66,14 @@ std::string Request::version() const { return http_version_; }
 std::string Request::raw_request() const { return original_string_; }
 std::vector<std::pair<std::string, std::string>> Request::headers() const { return headers_; }
 std::string Request::body() const { return body_; }
+std::string Request::ToString() const {
+  std::string request_msg = method() + " " + uri() + " " + version() + "\r\n";
+  std::vector<std::pair<std::string,std::string>> localheaders = headers();
+  for (std::vector<std::pair<std::string,std::string>>::const_iterator it = localheaders.begin(); it != localheaders.end(); ++it) {
+    request_msg += (it->first + ": " + it->second + "\r\n");
+  }
+  request_msg += "\r\n";
+  request_msg += body();
+
+  return request_msg;
+}

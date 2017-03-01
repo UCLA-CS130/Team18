@@ -68,7 +68,7 @@ void Session::do_read()
                       status = default_handler_->HandleRequest(*request, response);
                     else
                       status = handlers_[matching_string]->HandleRequest(*request, response);      
-                    
+		    std::cout << "Status of request: " << status << std::endl;
                     RequestHandlerStats *stats = RequestHandlerStats::getInstance();
                     stats->InsertRequest(request->uri(), status);
 
