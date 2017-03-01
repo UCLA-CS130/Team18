@@ -11,9 +11,8 @@ class SessionInputTest : public ::testing::Test {
     //Tests Parse with config in stringstream form
     bool CheckString(std::string str) {
       boost::asio::io_service io_service;
-      tcp::socket socket(io_service);
       config_ = new NginxConfig();
-      Session s(&socket, config_);
+      Session s(io_service, config_);
       char buffer[256];
       std::size_t size = str.size();
       strncpy(buffer, str.c_str(), size);
@@ -23,9 +22,8 @@ class SessionInputTest : public ::testing::Test {
 
     std::string GetOutput(std::string str, int status_code) {
       boost::asio::io_service io_service;
-      tcp::socket socket(io_service);
       config_ = new NginxConfig();
-      Session s(&socket, config_);
+      Session s(io_service, config_);
       std::size_t length = s.prepare_response(status_code, str);
       return s.OutputToString();
     }
