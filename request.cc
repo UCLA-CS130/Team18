@@ -7,7 +7,7 @@
 #include <iostream>
 
 
-Request::Request(std::string request_string)
+Request::Request(const std::string& request_string)
 {
   original_string_ = request_string;
   valid_ = ParseRequestString(request_string);
