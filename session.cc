@@ -26,8 +26,6 @@ Session::~Session()
   }
 }
 
-tcp::socket& Session::Socket() { return socket_; }
-
 void Session::init_handlers(NginxConfig* config)
 {
   RequestHandlerStats *stats = RequestHandlerStats::getInstance();
