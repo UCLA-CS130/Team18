@@ -67,13 +67,24 @@ std::string Request::raw_request() const { return original_string_; }
 std::vector<std::pair<std::string, std::string>> Request::headers() const { return headers_; }
 std::string Request::body() const { return body_; }
 std::string Request::ToString() const {
-  std::string request_msg = method() + " " + uri() + " " + version() + "\r\n";
+  std::string request_msg = method() + " " + uri() + " HTTP/" + version() + "\r\n";
   std::vector<std::pair<std::string,std::string>> localheaders = headers();
   for (std::vector<std::pair<std::string,std::string>>::const_iterator it = localheaders.begin(); it != localheaders.end(); ++it) {
     request_msg += (it->first + ": " + it->second + "\r\n");
   }
   request_msg += "\r\n";
   request_msg += body();
-
+  std::cout << "size of body: " <<body().length() << std::endl;
   return request_msg;
 }
+void Request::SetHeader(const std::string& header, const std::string& val) {
+  for (unsigned int i = 0; i < headers_.size(); ++i) {
+    if (headers_.at(i).first.compare(header)==0) {
+      headers_.at(i) = std::make_pair(header,val);
+      std::cout << "Set Header to: " << headers_.at(i).second << std::endl;
+      return;
+    }
+  }
+  headers_.push_back(std::make_pair(header,val));
+}
+

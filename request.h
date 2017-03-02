@@ -34,6 +34,7 @@ class Request {
     
     std::string body() const;
     void SetBody(const std::string& body) { body_ = body; }
+    void SetHeader(const std::string& header, const std::string& val);
   private:
     Request(const std::string& request_string); 
     std::string original_string_;

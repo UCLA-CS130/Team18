@@ -44,40 +44,79 @@ RequestHandler::Status ProxyHandler::HandleRequest(const Request& request,
   std::cout << "Full path: " << full_path << std::endl;
   Request proxy_request(request);
   proxy_request.SetUri("/"+partial_file_path);
-  return PerformRequest(request,response);
+  auto headers = proxy_request.headers();
+  for (auto it = headers.cbegin(); it != headers.cend(); ++it){
+    std::cout << it->first << std::endl;
+  }
+  proxy_request.SetHeader("Host", host_uri_);
+  proxy_request.SetHeader("Connection", "close");
+  return PerformRequest(proxy_request,response);
 }
 
 RequestHandler::Status ProxyHandler::PerformRequest(const Request& request,
 						    Response* response) {
-  boost::asio::streambuf responseBuf;
   try {
+    boost::system::error_code ec;
   boost::asio::io_service io_service;
-  boost::asio::ip::tcp::socket  socket(io_service);
   boost::asio::ip::tcp::resolver resolver(io_service);
-  boost::asio::ip::tcp::resolver::query query(host_uri_, host_port_.length()>0?host_port_:"http");
-  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve(query);
-  
-  boost::asio::connect(socket, endpoint_iterator);
+  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve({"www.ucla.edu","http"},ec);
+  if (ec) throw boost::system::system_error(ec);
+  boost::asio::ip::tcp::socket  socket(io_service);
+  boost::asio::connect(socket, endpoint_iterator,ec);
+  if (ec) throw boost::system::system_error(ec);
   boost::asio::streambuf requestBuf;
   std::ostream request_stream(&requestBuf);
-  request_stream << request.ToString();
-  // Send the request.
-  boost::asio::write(socket, requestBuf);
 
-
-  boost::system::error_code error;
   
+  request_stream << "GET / HTTP/1.0\r\n";
+  request_stream << "Host: www.ucla.edu\r\n";
+  request_stream << "Accept: */*\r\n";
+  request_stream << "Connection: close\r\n\r\n";
+
+  //request_stream << request.ToString();
+  // Send the request.
+  std::cout << "Sending " << &requestBuf << std::endl;
+  boost::asio::write(socket, requestBuf,ec);
+  if (ec) throw boost::system::system_error(ec);
+
   std::cout<<"Reading"<<std::endl;
-  while (boost::asio::read(socket, responseBuf,error));
-  if (error != boost::asio::error::eof) {
-    throw boost::system::system_error(error);
+  boost::asio::streambuf response_stream_buf;
+  boost::asio::read_until(socket, response_stream_buf, "\r\n", ec);
+  std::cout<<"Done Reading" << &response_stream_buf<<std::endl;
+  if (ec) throw boost::system::system_error(ec);
+  std::string raw_headers = "";
+  // Check that response is OK.
+  std::istream response_stream(&response_stream_buf);
+  std::string http_version;
+  response_stream >> http_version;
+  unsigned int status_code;
+  response_stream >> status_code;
+  std::string status_message;
+  std::getline(response_stream, status_message); // contains a space in front of it!
+  if (!response_stream || http_version.substr(0, 5) != "HTTP/")
+    {
+      // error handler
+      return RequestHandler::NOT_FOUND;
   }
+  raw_headers += http_version + " " + std::to_string(status_code) + status_message + "\r\n";
+  std::cout << "HEADERS: " << raw_headers << std::endl;
+  // Read the response headers, which are terminated by a blank line.
+  boost::asio::read_until(socket, response_stream_buf, "\r\n\r\n", ec);
+  if (ec) throw boost::system::system_error(ec);
+ 
+ // Process the 302 code
+  std::string header;
+  if (status_code == 302) {
+    while (std::getline(response_stream, header) && header != "\r") {
+      if (header.find("Location") != std::string::npos);
+	//	   return HandleRedirect(header, request, response);
+	
+	}
   }
-  catch (std::exception& e)
-  {
-    std::cout << "Exception: " << e.what() << "\n";
+  if (ec != boost::asio::error::eof) {
+    throw boost::system::system_error(ec);
   }
-  std::ostringstream ss;
+  /*  std::ostringstream ss;
   ss << &responseBuf;
   std::cout<<"Parsing" << ss.str()<<std::endl;
   auto response_p = Response::Parse(ss.str());
@@ -87,6 +126,13 @@ RequestHandler::Status ProxyHandler::PerformRequest(const Request& request,
     return RequestHandler::Status::OK;
   } else {
     //ERROR HANDLING
+    return RequestHandler::Status::NOT_FOUND;
+    }*/
+  return RequestHandler::Status::OK;
+  }
+  catch (std::exception& e)
+  {
+    std::cout << "Exception: " << e.what() << "\n";
     return RequestHandler::Status::NOT_FOUND;
   }
 
