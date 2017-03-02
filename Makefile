@@ -4,6 +4,9 @@ webserver:
 test:
 	./build_tests.sh
 
+threading-test: clean webserver
+	python threading_test.py
+
 integration:
 	python integration_test.py
 
