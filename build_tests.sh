@@ -5,7 +5,7 @@ case `uname` in
   Linux)
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -fprofile-arcs -ftest-coverage -c ${GTEST_DIR}/src/gtest-all.cc
     ar -rv libgtest.a gtest-all.o
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system -lboost_thread
     ./server_test && gcov -r server.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system
     ./session_test && gcov -r session.cc
