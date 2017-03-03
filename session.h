@@ -10,6 +10,7 @@
 
 #include <array>
 #include <boost/asio.hpp>
+#include <boost/enable_shared_from_this.hpp>
 #include <cstdlib>
 #include <memory>
 #include <string>
@@ -23,13 +24,13 @@ class NginxConfig;
 class Session : public std::enable_shared_from_this<Session>
 {
 public:
-    Session(tcp::socket* socket, NginxConfig* config);
+    explicit Session(boost::asio::io_service& io_service, NginxConfig* config);
     ~Session();
     void start() { do_read();}
     bool check_input(std::size_t length, char* buffer);
     std::size_t prepare_response(int status, std::string body);
     std::string OutputToString();
-
+    tcp::socket& Socket() { return socket_; }
 private:
     void init_handlers(NginxConfig* config);
     void do_read();
