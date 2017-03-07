@@ -10,12 +10,16 @@ class ProxyHandler : public RequestHandler {
     virtual RequestHandler::Status HandleRequest(const Request& request,
                                                  Response* response);
  private:
+    void SetNotFound(const Request& req, Response* res);
     const bool GetHostAndPort(std::string& host, std::string& port, const NginxConfig& config);
-    RequestHandler::Status PerformRequest(const Request& request,
-					  Response* response);
+    RequestHandler::Status PerformRequest(Request& request,
+					  Response* response,
+					  const std::string& host_uri,
+					  const std::string& host_port);
     std::string uri_prefix_;
     std::string host_uri_;
     std::string host_port_;
+    RequestHandler* not_found_handler_;
 };
 
 REGISTER_REQUEST_HANDLER(ProxyHandler);
