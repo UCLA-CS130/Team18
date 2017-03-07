@@ -1,7 +1,7 @@
 #include "response.h"
 #include <stdio.h>
 #include <string.h>
-
+#include <iostream>
 namespace status_strings {
   const std::string ok = "200 OK\r\n";
   const std::string bad_request = "400 Bad Request\r\n";
@@ -73,10 +73,11 @@ bool Response::ParseResponseString(const std::string& response_string) {
   if (!good_status)
     return false;
   while (std::getline(resp, header) && header != "\r") {
-    index = header.find(':', 0);
+    index = header.find_first_of(':', 0);
     cr = header.find('\r', index);
     if (index != std::string::npos) {
       AddHeader(header.substr(0, index), header.substr(index+2, cr - (index + 2) ));
+      
     }
   }
   SetBody(response_string.substr(response_string.find("\r\n\r\n") + 4));

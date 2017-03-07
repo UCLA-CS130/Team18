@@ -74,14 +74,12 @@ std::string Request::ToString() const {
   }
   request_msg += "\r\n";
   request_msg += body();
-  std::cout << "size of body: " <<body().length() << std::endl;
   return request_msg;
 }
 void Request::SetHeader(const std::string& header, const std::string& val) {
   for (unsigned int i = 0; i < headers_.size(); ++i) {
     if (headers_.at(i).first.compare(header)==0) {
       headers_.at(i) = std::make_pair(header,val);
-      std::cout << "Set Header to: " << headers_.at(i).second << std::endl;
       return;
     }
   }

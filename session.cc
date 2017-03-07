@@ -54,7 +54,6 @@ void Session::do_read()
             if (!ec) 
             {   if (reached_end)
                 {
-                    std::cout << "REACHED END" << std::endl;
                     request = Request::Parse(msg);
                     std::string matching_string = "";
                     for (std::map<std::string, RequestHandler*>::iterator it =
@@ -91,9 +90,7 @@ void Session::do_read()
 bool Session::check_input(std::size_t length, char* buffer)
 {
   std::string received(buffer, buffer + length);
-  std::cout << "RCVD: " << received;
   msg += received;
-  std::cout << "MSG: " << msg;
   return (msg.find("\r\n\r\n") != std::string::npos);
 }
 
@@ -121,7 +118,6 @@ std::size_t Session::prepare_response(int status, std::string body)
   std::size_t len = header.size() + body_length;
   body = header + body;
   to_send = body; 
-  std::cout << "SENDING MSG: " << body;
   msg = "";
   return len;
 } 
