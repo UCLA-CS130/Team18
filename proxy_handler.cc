@@ -62,7 +62,8 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
     boost::system::error_code ec;
   boost::asio::io_service io_service;
   boost::asio::ip::tcp::resolver resolver(io_service);
-  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve({"www.google.com","http"},ec);
+  //  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve({"www.google.com","http"},ec);
+  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve({host_uri,host_port},ec);
   if (ec) throw boost::system::system_error(ec);
   boost::asio::ip::tcp::socket  socket(io_service);
   boost::asio::connect(socket, endpoint_iterator,ec);
@@ -71,7 +72,7 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
   boost::asio::streambuf requestBuf;
   std::ostream request_stream(&requestBuf);
 
-  request_stream << "garbageljkafsdhladsfjio\r\n\r\n";
+  //request_stream << "garbageljkafsdhladsfjio\r\n\r\n";
 
   //request_stream << "GET / HTTP/1.0\r\n";
   //request_stream << "Host: www.ucla.edu\r\n";
@@ -79,7 +80,7 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
   //request_stream << "Connection: close\r\n\r\n";
 
 
-  //request_stream << request.ToString();
+  request_stream << request.ToString();
   // Send the request.
   std::cout << "Sending " << &requestBuf << std::endl;
   boost::asio::write(socket, requestBuf,ec);
