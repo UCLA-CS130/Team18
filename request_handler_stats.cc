@@ -22,7 +22,7 @@ void RequestHandlerStats::InsertHandler(std::string handler, std::string uri)
 {
   std::pair<std::string, std::string> handler_pair = std::make_pair(handler, uri);
   if (!(std::find(handlers_.begin(), handlers_.end(), handler_pair) != handlers_.end())) {
-    handlers_.push_back(std::make_pair(handler, uri));
+    handlers_.push_back(handler_pair);
   }
 }
 
