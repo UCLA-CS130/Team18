@@ -5,7 +5,7 @@ case `uname` in
   Linux)
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -fprofile-arcs -ftest-coverage -c ${GTEST_DIR}/src/gtest-all.cc
     ar -rv libgtest.a gtest-all.o
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system -lboost_thread
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc proxy_handler.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system -lboost_thread
     ./server_test && gcov -r server.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system
     ./session_test && gcov -r session.cc
@@ -25,6 +25,8 @@ case `uname` in
     ./status_handler_test && gcov -r status_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage request_handler_stats_test.cc request_handler.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_handler_stats_test
     ./request_handler_stats_test && gcov -r request_handler_stats.cc
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage proxy_handler_test.cc request_handler.cc proxy_handler.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o proxy_handler_test
+    ./proxy_handler_test && gcov -r proxy_handler_test.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
     ./config_parser_test && gcov -r config_parser.cc;;
   Darwin)
