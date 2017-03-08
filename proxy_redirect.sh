@@ -14,7 +14,7 @@ echo "port 2020;
 server_name 127.0.0.1;
 
 path /proxy ProxyHandler{
-  host www.ucla.edu;
+  host ucla.edu;
   port 80;
 }
 
@@ -41,16 +41,15 @@ EXIT_STATUS=$?
 # Error handling
 if [ "$EXIT_STATUS" -eq 0 ]
 then
-    echo "SUCCESS: Integration test passed"
+    echo "SUCCESS: Redirect test passed"
 else
-    echo "FAILED: Integration test failed"
+    echo "FAILED: Redirect test failed"
     echo "diff:"
     echo $DIFF
 fi
 
 # Shutdown the webserver and cleanup
 echo "Cleaning up and shutting down"
-
 pkill -9 webserver
 make clean
 rm temp_*

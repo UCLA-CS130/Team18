@@ -53,6 +53,8 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
 						    Response* response,
 						    const std::string& host_uri,
 						    const std::string& host_port) {
+  std::cout << request.ToString() << std::endl;
+
   try {
     boost::system::error_code ec;
   boost::asio::io_service io_service;
@@ -85,10 +87,14 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
       std::string new_location = response_p->get_header("Location").substr(17)//get rid of Location http://
 	;
       std::size_t first_slash_location = new_location.find("/");
+      int size = new_location.size() - 2 - first_slash_location;
       //TODO check for PORT
-      request.SetUri(new_location.substr(first_slash_location));
+      
+      request.SetUri(new_location.substr(first_slash_location,size));
       request.SetHeader("Host",new_location.substr(0,first_slash_location));
       PerformRequest(request,response,new_location.substr(0,first_slash_location),"80");
+      // response->AddHeader("Transfer-Encoding", "identity");
+      // std::cout << response->ToString() << std::endl;
     }
     else {
       //no redirect, all good to go
