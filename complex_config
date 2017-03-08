@@ -7,7 +7,9 @@ path /echo EchoHandler { }
 
 path /static StaticHandler {
 	root static_src;
-} 
+}
+
+path /status StatusHandler { }
 
 
 default BadRequestHandler {} #Default response handler if no handlers match.
