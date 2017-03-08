@@ -31,9 +31,8 @@ protected:
       NginxConfig out_config;
       parser.Parse(&config_stream, &out_config);
       std::cout << "Init" << std::endl;
-      std::cout << out_config.ToString() << std::endl;
       handler_ = RequestHandler::CreateByName("ProxyHandler");
-      std::cout << "Handler: " << handler_ << std::endl;
+      
       return handler_->Init(proxy_path, out_config);
     }
   std::unique_ptr<Request> request_;
@@ -47,10 +46,13 @@ TEST_F(ProxyHandlerTest, RedirectTest) {
 
 }
 TEST_F(ProxyHandlerTest,WrongPort) {
-  std::string host = "hello.hello";
-  std::cout << "" << std::endl;
-  EXPECT_EQ(Initialize("/",host,"80"),RequestHandler::Status::NOT_FOUND);
+  std::string host = "hello.hello1234$@!#";
+  Initialize("/",host,"80");
+  EXPECT_EQ(HandleRequest("GET / HTTP/1.0\r\nConnection: close\r\n\r\n"),RequestHandler::Status::NOT_FOUND);
    
 }
 TEST_F(ProxyHandlerTest,WrongHost) {
+  std::string port = "-12358235478423578253478";
+  Initialize("/","www.ucla.edu",port);
+  EXPECT_EQ(HandleRequest("GET / HTTP/1.0\r\nConnection: close\r\n\r\n"),RequestHandler::Status::NOT_FOUND);
 }
