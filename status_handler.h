@@ -16,6 +16,7 @@ class StatusHandler : public RequestHandler {
     std::string GetDefaultHTML();
     std::string GetRequestHandlerHTML();
     std::string GetURLRequestsHTML();
+    std::string handler_html_;
 };
 
 REGISTER_REQUEST_HANDLER(StatusHandler);
