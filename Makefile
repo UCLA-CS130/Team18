@@ -5,7 +5,7 @@ test:
 	./build_tests.sh
 
 deploy:
-	docker build -t htpserver.build .
+	docker build -t httpserver.build .
 	docker run httpserver.build > binary.tar
 	mkdir deploy
 	cp complex_config ./deploy
