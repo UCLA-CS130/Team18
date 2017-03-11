@@ -3,6 +3,7 @@
 #include "response.h"
 #include "config_parser.h"
 #include <string>
+#include <algorithm>
 #include <fstream>
 #include <sstream>
 
@@ -58,7 +59,16 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
     f.close();
     std::string body(membuff, size);
     delete membuff;
-    SetOk(request, response, body);
+
+    std::vector<std::pair<std::string, std::string>> headers = request.headers();
+    std::pair<std::string, std::string> accept_gzip = std::make_pair("Accept-Encoding", "gzip, deflate");
+    if (std::find(headers.begin(), headers.end(), accept_gzip) != headers.end()) {
+      std::cout << "GZIPPPPPPPPPPPPPPPPPED" << std::endl;
+      SetOk(request, response, body);
+    } else {
+      std::cout << "NOT GZIPPPPPPPPPPPPPPPPPED" << std::endl;
+      SetOk(request, response, body);
+    }
   }
   else
   {
