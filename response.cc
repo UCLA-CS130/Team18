@@ -51,9 +51,15 @@ std::string Response::to_string(Response::ResponseCode status) {
 void Response::SetStatus(const Response::ResponseCode response_code) { 
   status = response_code; 
 }
+
 void Response::AddHeader(const std::string& header_name, 
                         const std::string& header_value) { 
   headers.insert(std::make_pair(header_name, header_value));
+}
+
+void Response::SetOrAddHeader(const std::string& header_name,
+                              const std::string& header_value) {
+  headers[header_name] = header_value;
 }
 void Response::SetBody(const std::string& body) {
   response_body = body; 

@@ -64,15 +64,7 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
     std::string body(membuff, size);
     delete membuff;
 
-    std::vector<std::pair<std::string, std::string>> headers = request.headers();
-    std::pair<std::string, std::string> accept_gzip = std::make_pair("Accept-Encoding", "gzip, deflate");
-    if (std::find(headers.begin(), headers.end(), accept_gzip) != headers.end()) {
-      std::cout << "GZIPPPPPPPPPPPPPPPPPED" << std::endl;
-      SetGzip(request, response, body);
-    } else {
-      std::cout << "NOT GZIPPPPPPPPPPPPPPPPPED" << std::endl;
-      SetOk(request, response, body);
-    }
+    SetOk(request, response, body);
   }
   else
   {
@@ -111,33 +103,6 @@ void StaticHandler::SetOk(const Request& req, Response* res, std::string file_bo
   length = temp.str();
   res->AddHeader("Content-Length", length);
   res->SetBody(file_body);
-}
-
-void StaticHandler::SetGzip(const Request& req, Response* res, std::string file_body)
-{
-  res->SetStatus(Response::ok);
-  std::string content_type = GetContentType();      
-  res->AddHeader("Content-Type", content_type);
-  res->AddHeader("Content-Encoding", "gzip");
-  std::string length;
-  std::ostringstream temp;
-  
-  std::stringstream compressed;
-  boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
-  in.push(boost::iostreams::gzip_compressor());
-  std::stringstream data;
-  data << file_body;
-  in.push(data);
-  boost::iostreams::copy(in, compressed);
-
-  
-  std::string body_gzip = compressed.str();
-  temp  <<  ((int) body_gzip.size());
-  length = temp.str();
-  std::cout << "Compressed length: " << length << std::endl;
-
-  res->AddHeader("Content-Length", length);
-  res->SetBody(body_gzip);
 }
 
 std::string StaticHandler::GetContentType()
