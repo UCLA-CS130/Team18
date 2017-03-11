@@ -17,7 +17,6 @@ class StaticHandler: public RequestHandler {
     std::string GetContentType();
     void SetNotFound(const Request& req, Response* res);
     void SetOk(const Request& req, Response* res, std::string file_body);
-    void SetGzip(const Request& req, Response* res, std::string file_body);
     const bool GetRootPath(std::string& root_path, const NginxConfig& config);
     std::string root_path_;
     std::string uri_prefix_;

@@ -3,12 +3,7 @@
 #include "response.h"
 #include "config_parser.h"
 #include <string>
-#include <algorithm>
-#include <boost/iostreams/filtering_streambuf.hpp>
-#include <boost/iostreams/copy.hpp>
-#include <boost/iostreams/filter/gzip.hpp>
 #include <fstream>
-#include <iostream>
 #include <sstream>
 
 StaticHandler::StaticHandler()
@@ -63,7 +58,6 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
     f.close();
     std::string body(membuff, size);
     delete membuff;
-
     SetOk(request, response, body);
   }
   else
@@ -91,7 +85,6 @@ void StaticHandler::SetNotFound(const Request& req, Response* res)
 {
   not_found_handler_->HandleRequest(req, res);
 }
-
 void StaticHandler::SetOk(const Request& req, Response* res, std::string file_body)
 {
   res->SetStatus(Response::ok);
