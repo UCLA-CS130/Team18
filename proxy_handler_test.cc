@@ -41,9 +41,10 @@ protected:
 };
 
 TEST_F(ProxyHandlerTest, SimpleUCLACurl) {
+  //integration test covers this
 }
 TEST_F(ProxyHandlerTest, RedirectTest) {
-
+  //integration test covers this
 }
 TEST_F(ProxyHandlerTest,WrongPort) {
   std::string host = "hello.hello1234$@!#";
