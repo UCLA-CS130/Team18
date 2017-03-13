@@ -1,0 +1,9 @@
+port 2020;
+server_name 127.0.0.1;
+
+path / ProxyHandler {
+	host www.ucla.edu;
+	port 80;
+}
+
+default NotFoundHandler{}

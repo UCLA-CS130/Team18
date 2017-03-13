@@ -1,6 +1,9 @@
 #include "response.h"
 #include <stdio.h>
 #include <string.h>
+#include <iostream>
+
+
 
 namespace status_strings {
   const std::string ok = "200 OK\r\n";
@@ -8,8 +11,19 @@ namespace status_strings {
   const std::string not_found = "404 Not Found\r\n";
 }
 
+
+std::unique_ptr<Response> Response::Parse(const std::string& raw_response)
+    { 
+      std::unique_ptr<Response> req(new Response(raw_response));
+      if (req->valid_)
+        return req;
+      else
+        return std::unique_ptr<Response>(nullptr);
+    }
+
+
 std::string Response::ToString() {
-  std::string response_msg = "HTTP/1.1 "  + to_string(status);
+  std::string response_msg = version + " " + status;
   std::map<std::string, std::string>::iterator it;
   for (it = headers.begin(); it != headers.end(); it++) {
     response_msg += get_header(it->first);
@@ -49,7 +63,7 @@ std::string Response::to_string(Response::ResponseCode status) {
 }
 
 void Response::SetStatus(const Response::ResponseCode response_code) { 
-  status = response_code; 
+  status = to_string(response_code); 
 }
 
 void Response::AddHeader(const std::string& header_name, 
@@ -64,4 +78,42 @@ void Response::SetOrAddHeader(const std::string& header_name,
 void Response::SetBody(const std::string& body) {
   response_body = body; 
 } 
-   
+
+Response::Response(const std::string& response_string) {
+  valid_ = ParseResponseString(response_string);
+}
+bool Response::ParseResponseString(const std::string& response_string) {
+  std::istringstream resp(response_string);
+  std::string header;
+  std::string status;
+  std::string::size_type index;
+  std::string::size_type cr; // carriage reutn location
+  std::getline(resp, status);
+  bool good_status = DecodeStatus(status); 
+  if (!good_status)
+    return false;
+  while (std::getline(resp, header) && header != "\r") {
+    index = header.find_first_of(':', 0);
+    cr = header.find('\r', index);
+    if (index != std::string::npos) {
+      AddHeader(header.substr(0, index), header.substr(index+2, cr - (index + 2) ));
+      
+    }
+  }
+  SetBody(response_string.substr(response_string.find("\r\n\r\n") + 4));
+  return true;
+}
+bool Response::DecodeStatus(std::string status_line) {
+  std::size_t front = 0;
+  std::size_t back = 0;
+  back = status_line.find(' ');
+  if (back == std::string::npos)
+    return false;
+  version = (status_line.substr(front, back-front));
+  front = back + 1;
+  back = status_line.find('\r', front);
+  if (back == std::string::npos || back == front)
+    return false;
+  status = (status_line.substr(front, back - front));
+  return true;
+}

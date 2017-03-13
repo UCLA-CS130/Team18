@@ -25,6 +25,8 @@ case `uname` in
     ./status_handler_test && gcov -r status_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage request_handler_stats_test.cc request_handler.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_handler_stats_test
     ./request_handler_stats_test && gcov -r request_handler_stats.cc
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage proxy_handler_test.cc request_handler.cc proxy_handler.cc not_found_handler.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a response.cc request.cc config_parser.cc -lpthread -lboost_system -o proxy_handler_test
+    ./proxy_handler_test && gcov -r proxy_handler_test.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage gzip_handler_test.cc gzip.cpp zlib.cpp gzip_handler.cc request_handler.cc request.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o gzip_handler_test -lboost_system -L/opt/lib -lboost_iostreams -lz
     ./gzip_handler_test && gcov -r gzip_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
