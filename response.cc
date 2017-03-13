@@ -2,14 +2,28 @@
 #include <stdio.h>
 #include <string.h>
 #include <iostream>
+
+
+
 namespace status_strings {
   const std::string ok = "200 OK\r\n";
   const std::string bad_request = "400 Bad Request\r\n";
   const std::string not_found = "404 Not Found\r\n";
 }
 
+
+std::unique_ptr<Response> Response::Parse(const std::string& raw_response)
+    { 
+      std::unique_ptr<Response> req(new Response(raw_response));
+      if (req->valid_)
+        return req;
+      else
+        return std::unique_ptr<Response>(nullptr);
+    }
+
+
 std::string Response::ToString() {
-  std::string response_msg = version+" "+ status;
+  std::string response_msg = version + " " + status;
   std::map<std::string, std::string>::iterator it;
   for (it = headers.begin(); it != headers.end(); it++) {
     response_msg += get_header(it->first);

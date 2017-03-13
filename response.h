@@ -14,14 +14,7 @@ class Response {
   	  bad_request = 400,
   	  not_found = 404
     };
-static std::unique_ptr<Response> Parse(const std::string& raw_response)
-    { 
-      std::unique_ptr<Response> req(new Response(raw_response));
-      if (req->valid_)
-        return req;
-      else
-        return std::unique_ptr<Response>(nullptr);
-    }
+    static std::unique_ptr<Response> Parse(const std::string& raw_response);
     void SetStatus(const ResponseCode response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
     void SetOrAddHeader(const std::string& header_name, const std::string& header_value);
