@@ -34,6 +34,10 @@ First decision to be made was choice of Markdown rendering library. Fortunately,
 
 An additional decision was what to do if there was some error in the rendering of the HTML file (i.e. the function that converted the file returned indicated the read has failed). Our first idea was to return the .md file as is, and just let them view the original file. In the end, we realized that our server should be consistent, so .md files should be rendered as expected or not returned at all. In addition, we could not be sure of the possible issues that would arise in the attempt to render the file. For these reasons, we chose to return a 404 response if the file could not be rendered for some reason.
 
+#### Demo Markdown Instructions
+Simply visit this web page, http://ec2-35-166-129-63.us-west-2.compute.amazonaws.com:8080/static/assignment_9.md
+Also visit http://ec2-35-166-129-63.us-west-2.compute.amazonaws.com:8080/static/assignment_9.txt which contains the same contents, only in a text file to show the original .md file contents before it is rendered.
+
 ## HTTP gzip compression
 
 When our webserver receives a request with header "Accept-Encoding: gzip, deflate", we will generate a response with the appropriate RequestHandler, and then call our GzipHandler's HandleRequest method. The GzipHandler will extract the response's body, compress it, update the response's Content-Length, and add the "Content-Encoding: gzip" header.
@@ -51,3 +55,8 @@ First, we needed to once again pick a library for use in our program. This was a
 Additionally, we needed to decide how compression should be handled (i.e. where in the code should compression occur & what object handles the compression). We initially placed the compression code in the same handler that handles serving static files. We quickly realized that this was not a sustainable decision, as compression may need to be utilized for other types of requests and because we may want to turn off compression for static files depending on various factors. Our decision then was to create a handler specifically for Gzip compression, that would work on a response created by another handler. The only API change needed was to add a method to read the body of a Response object, which is not going to cause any issue in working with the code in the future. This may allow for configuration of the server as well as the ability to compress our responses for different types of requests. The flexibility for future design was key in making this decision.
 
 Another decision was whether the compression handler should act as one of the handlers that is linked to a URL path like the ones that we have previously built. We decided against that and stuck to this decision because we didn't see any use for allowing the user to access the handler from a browser (since we would prefer to choose if compression occurs) and because there really is no use for that except for very specific functionality on the user's end. In the end, we just created the handler as a member variable for the Session objects that handle requests, allowing its use for compressing the results of any other handler.
+
+#### Demo HTTP compression Instructions
+Within a Chrome or Firefox browser, open up network tools.
+Visit http://ec2-35-166-129-63.us-west-2.compute.amazonaws.com:8080/static/PMT.gif
+Check the headers of the response for "Content-Encoding: gzip"
