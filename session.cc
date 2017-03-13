@@ -19,6 +19,8 @@ Session::Session(boost::asio::io_service& io_service, NginxConfig* config)
 
 Session::~Session()
 {
+  delete gzip_handler_;
+
   for(std::map<std::string, RequestHandler*>::iterator it = handlers_.begin(); it != handlers_.end(); it++)
   {
     delete it->second;
@@ -28,14 +30,16 @@ Session::~Session()
 
 void Session::init_handlers(NginxConfig* config)
 {
+  gzip_handler_ = new GzipHandler();
+
   RequestHandlerStats *stats = RequestHandlerStats::getInstance();
   for (unsigned i = 0; i < (unsigned long) config->statements_.size(); i++) {
     std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
     if (config_statement->tokens_[0] == "path" && config_statement->tokens_.size() == 3) {
       std::string uri = config_statement->tokens_[1];
+      stats->RequestHandlerStats::InsertHandler(config_statement->tokens_[2].c_str(), uri);
       handlers_[uri] = (RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
       handlers_[uri]->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
-      stats->RequestHandlerStats::InsertHandler(config_statement->tokens_[2].c_str(), uri);
     } else if (config_statement->tokens_[0] == "default" && config_statement->tokens_.size() == 2) {
       default_handler_ = (RequestHandler::CreateByName(config_statement->tokens_[1].c_str()));
       default_handler_->Init("", *config_statement->child_block_.get());
@@ -69,7 +73,13 @@ void Session::do_read()
                       status = default_handler_->HandleRequest(*request, response);
                     else
                       status = handlers_[matching_string]->HandleRequest(*request, response);      
-		    std::cout << "Status of request: " << status << std::endl;
+
+                    std::vector<std::pair<std::string, std::string>> headers = request->headers();
+                    std::pair<std::string, std::string> accept_gzip = std::make_pair("Accept-Encoding", "gzip, deflate");
+                    if (std::find(headers.begin(), headers.end(), accept_gzip) != headers.end()) {
+                      gzip_handler_->HandleRequest(*request, response);
+                    }
+
                     RequestHandlerStats *stats = RequestHandlerStats::getInstance();
                     stats->InsertRequest(request->uri(), status);
 
