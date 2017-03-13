@@ -1,6 +1,8 @@
 CS130 Team 18 nginx server
 Michael Chen and Spencer Gervais
 
+Server running at http://ec2-35-166-129-63.us-west-2.compute.amazonaws.com:8080/
+
 Follows common API: https://github.com/UCLA-CS130/webserver-api
 Includes code from googletest-1.7.0. See https://code.google.com/p/googletest/
 Inspired by https://github.com/fatiherikli/nginxparser
