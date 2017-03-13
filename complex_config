@@ -11,6 +11,4 @@ path /static StaticHandler {
 
 path /status StatusHandler { }
 
-path /status StatusHandler { }
-
 default BadRequestHandler {} #Default response handler if no handlers match.

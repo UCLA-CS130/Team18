@@ -5,9 +5,9 @@ case `uname` in
   Linux)
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -I${GTEST_DIR} -pthread -fprofile-arcs -ftest-coverage -c ${GTEST_DIR}/src/gtest-all.cc
     ar -rv libgtest.a gtest-all.o
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc config_parser.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc markdown.cpp markdown-tokens.cpp ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system -lboost_thread -lboost_regex
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage server_test.cc gzip.cpp zlib.cpp gzip_handler.cc config_parser.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc server.cc request_handler_stats.cc markdown.cpp markdown-tokens.cpp ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o server_test -lboost_system -lboost_regex -lboost_thread -L/opt/lib -lboost_iostreams -lz
     ./server_test && gcov -r server.cc
-    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc request_handler_stats.cc markdown.cpp markdown-tokens.cpp ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -lboost_regex
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage session_test.cc gzip.cpp zlib.cpp gzip_handler.cc request_handler.cc request.cc response.cc echo_handler.cc static_handler.cc bad_request_handler.cc session.cc request_handler_stats.cc markdown.cpp markdown-tokens.cpp ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o session_test -lboost_system -lboost_regex -L/opt/lib -lboost_iostreams -lz
     ./session_test && gcov -r session.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage response_test.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o response_test
     ./response_test && gcov -r response.cc
@@ -25,6 +25,8 @@ case `uname` in
     ./status_handler_test && gcov -r status_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage request_handler_stats_test.cc request_handler.cc request_handler_stats.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o request_handler_stats_test
     ./request_handler_stats_test && gcov -r request_handler_stats.cc
+    g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage gzip_handler_test.cc gzip.cpp zlib.cpp gzip_handler.cc request_handler.cc request.cc response.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o gzip_handler_test -lboost_system -L/opt/lib -lboost_iostreams -lz
+    ./gzip_handler_test && gcov -r gzip_handler.cc
     g++ -std=c++0x -isystem ${GTEST_DIR}/include -pthread -fprofile-arcs -ftest-coverage config_parser_test.cc config_parser.cc ${GTEST_DIR}/src/gtest_main.cc libgtest.a -o config_parser_test
     ./config_parser_test && gcov -r config_parser.cc;;
   Darwin)

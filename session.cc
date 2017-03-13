@@ -19,6 +19,8 @@ Session::Session(boost::asio::io_service& io_service, NginxConfig* config)
 
 Session::~Session()
 {
+  delete gzip_handler_;
+
   for(std::map<std::string, RequestHandler*>::iterator it = handlers_.begin(); it != handlers_.end(); it++)
   {
     delete it->second;
@@ -28,6 +30,8 @@ Session::~Session()
 
 void Session::init_handlers(NginxConfig* config)
 {
+  gzip_handler_ = new GzipHandler();
+
   RequestHandlerStats *stats = RequestHandlerStats::getInstance();
   for (unsigned i = 0; i < (unsigned long) config->statements_.size(); i++) {
     std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
@@ -71,6 +75,12 @@ void Session::do_read()
                     else
                       status = handlers_[matching_string]->HandleRequest(*request, response);      
                     
+                    std::vector<std::pair<std::string, std::string>> headers = request->headers();
+                    std::pair<std::string, std::string> accept_gzip = std::make_pair("Accept-Encoding", "gzip, deflate");
+                    if (std::find(headers.begin(), headers.end(), accept_gzip) != headers.end()) {
+                      gzip_handler_->HandleRequest(*request, response);
+                    }
+
                     RequestHandlerStats *stats = RequestHandlerStats::getInstance();
                     stats->InsertRequest(request->uri(), status);
 
