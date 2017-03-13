@@ -17,7 +17,7 @@ RequestHandler::Status GzipHandler::HandleRequest(const Request& request,
 {
   response->AddHeader("Content-Encoding", "gzip");
   std::string length;
-  std::ostringstream temp; 
+  std::ostringstream gzip_stream; 
   std::stringstream compressed;
   std::stringstream data;
   boost::iostreams::filtering_streambuf<boost::iostreams::input> in;
@@ -27,8 +27,8 @@ RequestHandler::Status GzipHandler::HandleRequest(const Request& request,
   boost::iostreams::copy(in, compressed);
   
   std::string body_gzip = compressed.str();
-  temp  <<  ((int) body_gzip.size());
-  length = temp.str();
+  gzip_stream  <<  ((int) body_gzip.size());
+  length = gzip_stream.str();
 
   response->SetOrAddHeader("Content-Length", length);
   response->SetBody(body_gzip);
