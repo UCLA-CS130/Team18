@@ -8,7 +8,7 @@ class GzipHandler: public RequestHandler {
     virtual RequestHandler::Status Init(const std::string& uri_prefix,
                                         const NginxConfig& config);
     virtual RequestHandler::Status HandleRequest(const Request& request,
-    							                 Response* response);
+                                                 Response* response);
 };
 
 REGISTER_REQUEST_HANDLER(GzipHandler);
