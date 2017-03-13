@@ -76,11 +76,16 @@ void Session::do_read()
                       status = handlers_[matching_string]->HandleRequest(*request, response);      
                     
                     std::vector<std::pair<std::string, std::string>> headers = request->headers();
-                    std::pair<std::string, std::string> accept_gzip = std::make_pair("Accept-Encoding", "gzip, deflate");
-                    if (std::find(headers.begin(), headers.end(), accept_gzip) != headers.end()) {
-                      gzip_handler_->HandleRequest(*request, response);
+
+
+                    for (auto it = headers.begin(); it != headers.end(); it++) {
+                      if (!it->first.compare("Accept-Encoding") && it->second.find("gzip") != std::string::npos) {
+                        gzip_handler_->HandleRequest(*request, response);
+                      }
                     }
 
+                    
+                    
                     RequestHandlerStats *stats = RequestHandlerStats::getInstance();
                     stats->InsertRequest(request->uri(), status);
 
