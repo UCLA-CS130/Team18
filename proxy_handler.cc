@@ -1,8 +1,9 @@
 #include "proxy_handler.h"
 #include "config_parser.h"
 #include <boost/asio.hpp>
+
 RequestHandler::Status ProxyHandler::Init(const std::string& uri_prefix,
-                                         const NginxConfig& config)
+                                          const NginxConfig& config)
 {
   not_found_handler_ = (RequestHandler::CreateByName("NotFoundHandler"));
   not_found_handler_->Init("", config);
@@ -19,7 +20,7 @@ RequestHandler::Status ProxyHandler::Init(const std::string& uri_prefix,
 }
 
 RequestHandler::Status ProxyHandler::HandleRequest(const Request& request,
-                                                  Response* response)
+                                                   Response* response)
 {
   std::cout << "Handling Request" << std::endl;
   std::string request_uri = request.uri();
@@ -57,67 +58,67 @@ RequestHandler::Status ProxyHandler::PerformRequest(Request& request,
 
   try {
     boost::system::error_code ec;
-  boost::asio::io_service io_service;
-  boost::asio::ip::tcp::resolver resolver(io_service);
-  boost::asio::ip::tcp::resolver::iterator  endpoint_iterator = resolver.resolve({host_uri,host_port},ec);
-  if (ec) throw boost::system::system_error(ec);
-  boost::asio::ip::tcp::socket  socket(io_service);
-  boost::asio::connect(socket, endpoint_iterator,ec);
-  socket.set_option(boost::asio::ip::tcp::no_delay(true));
-  if (ec) throw boost::system::system_error(ec);
-  boost::asio::streambuf requestBuf;
-  std::ostream request_stream(&requestBuf);
-
-  request_stream << request.ToString();
-  // Send the request.
-  boost::asio::write(socket, requestBuf,ec);
-  if (ec) throw boost::system::system_error(ec);
-  boost::asio::streambuf response_stream_buf;
-  boost::asio::read(socket,response_stream_buf,boost::asio::transfer_all(),ec);
-  if (ec && ec != boost::asio::error::eof) throw boost::system::system_error(ec);
-  
-  //parse the message
-  std::ostringstream ss;
-  ss << &response_stream_buf;
-  auto response_p = Response::Parse(ss.str());
-  if (response_p.get() != nullptr) {
-    if (response_p->GetStatus().find("302")!=std::string::npos) {
-      std::cout << "Found cout, redirecting" << std::endl;
-      //we need to redirect
-      std::string new_location = response_p->get_header("Location").substr(17)//get rid of Location http://
-	;
-      std::size_t first_slash_location = new_location.find("/");
-      int size = new_location.size() - 2 - first_slash_location;
-      //TODO check for PORT
-      
-      request.SetUri(new_location.substr(first_slash_location,size));
-      request.SetHeader("Host",new_location.substr(0,first_slash_location));
-      PerformRequest(request,response,new_location.substr(0,first_slash_location),"80");
-      // response->AddHeader("Transfer-Encoding", "identity");
-      // std::cout << response->ToString() << std::endl;
+    boost::asio::io_service io_service;
+    boost::asio::ip::tcp::resolver resolver(io_service);
+    boost::asio::ip::tcp::resolver::iterator endpoint_iterator = resolver.resolve({host_uri,host_port},ec);
+    if (ec) throw boost::system::system_error(ec);
+    boost::asio::ip::tcp::socket  socket(io_service);
+    boost::asio::connect(socket, endpoint_iterator,ec);
+    socket.set_option(boost::asio::ip::tcp::no_delay(true));
+    if (ec) throw boost::system::system_error(ec);
+    boost::asio::streambuf requestBuf;
+    std::ostream request_stream(&requestBuf);
+    
+    request_stream << request.ToString();
+    // Send the request.
+    boost::asio::write(socket, requestBuf,ec);
+    if (ec) throw boost::system::system_error(ec);
+    boost::asio::streambuf response_stream_buf;
+    boost::asio::read(socket,response_stream_buf,boost::asio::transfer_all(),ec);
+    if (ec && ec != boost::asio::error::eof) throw boost::system::system_error(ec);
+    
+    //parse the message
+    std::ostringstream ss;
+    ss << &response_stream_buf;
+    auto response_p = Response::Parse(ss.str());
+    if (response_p.get() != nullptr) {
+      if (response_p->GetStatus().find("302")!=std::string::npos) {
+	std::cout << "Found cout, redirecting" << std::endl;
+	//we need to redirect
+	std::string new_location = response_p->get_header("Location").substr(17)//get rid of Location http://
+	  ;
+	std::size_t first_slash_location = new_location.find("/");
+	int size = new_location.size() - 2 - first_slash_location;
+	//TODO check for PORT
+	
+	request.SetUri(new_location.substr(first_slash_location,size));
+	request.SetHeader("Host",new_location.substr(0,first_slash_location));
+	PerformRequest(request,response,new_location.substr(0,first_slash_location),"80");
+	// response->AddHeader("Transfer-Encoding", "identity");
+	// std::cout << response->ToString() << std::endl;
+      }
+      else {
+	//no redirect, all good to go
+	*response = *response_p.get(); // copy constructor
+	return RequestHandler::Status::OK;
+      }
+    } else {
+      SetNotFound(request,response);
+      return RequestHandler::Status::NOT_FOUND;
     }
-    else {
-      //no redirect, all good to go
-      *response = *response_p.get(); // copy constructor
-      return RequestHandler::Status::OK;
-    }
-  } else {
+    return RequestHandler::Status::OK;
+  }
+  catch (std::exception& e) {
+    std::cout << "Exception: " << e.what() << std::endl;
     SetNotFound(request,response);
     return RequestHandler::Status::NOT_FOUND;
-  }
-  return RequestHandler::Status::OK;
-  }
-  catch (std::exception& e)
-    {
-      std::cout << "Exception: " << e.what() << std::endl;
-      SetNotFound(request,response);
-    return RequestHandler::Status::NOT_FOUND;
-  }
-
-
+  } 
 }
 
-const bool ProxyHandler::GetHostAndPort(std::string& host, std::string& port, const NginxConfig& config) {
+const bool ProxyHandler::GetHostAndPort(std::string& host, 
+					std::string& port, 
+					const NginxConfig& config) 
+{
   bool foundHost;
   for (unsigned i = 0; i < (unsigned long) config.statements_.size(); i++) {
     std::shared_ptr<NginxConfigStatement> config_statement = config.statements_[i];
