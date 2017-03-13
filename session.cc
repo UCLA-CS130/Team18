@@ -37,9 +37,9 @@ void Session::init_handlers(NginxConfig* config)
     std::shared_ptr<NginxConfigStatement> config_statement = config->statements_[i];
     if (config_statement->tokens_[0] == "path" && config_statement->tokens_.size() == 3) {
       std::string uri = config_statement->tokens_[1];
+      stats->RequestHandlerStats::InsertHandler(config_statement->tokens_[2].c_str(), uri);
       handlers_[uri] = (RequestHandler::CreateByName(config_statement->tokens_[2].c_str()));
       handlers_[uri]->Init(config_statement->tokens_[1], *config_statement->child_block_.get());
-      stats->RequestHandlerStats::InsertHandler(config_statement->tokens_[2].c_str(), uri);
     } else if (config_statement->tokens_[0] == "default" && config_statement->tokens_.size() == 2) {
       default_handler_ = (RequestHandler::CreateByName(config_statement->tokens_[1].c_str()));
       default_handler_->Init("", *config_statement->child_block_.get());
