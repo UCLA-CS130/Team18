@@ -4,6 +4,7 @@
 RequestHandler::Status StatusHandler::Init(const std::string& uri_prefix,
                                            const NginxConfig& config)
 {
+  handler_html_ = GetRequestHandlerHTML();
   return RequestHandler::Status::OK;
 }
 
@@ -12,7 +13,7 @@ RequestHandler::Status StatusHandler::HandleRequest(const Request& request,
 {
   std::string status_page = "<html>";
   status_page += GetDefaultHTML();
-  status_page += GetRequestHandlerHTML();
+  status_page += handler_html_;
   status_page += GetURLRequestsHTML();
 
   status_page += "</html>";

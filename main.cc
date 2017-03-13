@@ -5,6 +5,8 @@
 #include <cstdlib>
 #include <iostream>
 
+#define BOOST_IOSTREAMS_NO_LIB
+
 int main(int argc, char* argv[]) {
   try
   {

@@ -34,7 +34,7 @@ TEST_F(StatusHandlerTest, StatusRequest) {
 		Connection: keep-alive\r\n\
 		Upgrade-Insecure-Requests: 1\r\n\r\n";
   HandleRequest(request);
-  EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Length: 227\r\n\r\n<html><p>Default Handler: Default Handler not specified</p><table><tr><th>Request Handler</th><th>URL Prefix</th></tr></table><p>Number of Requests: 0</p><table><tr><th>URL Request</th><th>Response Code</th></tr></table></html>",
+  EXPECT_EQ("HTTP/1.1 200 OK\r\nContent-Length: 160\r\n\r\n<html><p>Default Handler: Default Handler not specified</p><p>Number of Requests: 0</p><table><tr><th>URL Request</th><th>Response Code</th></tr></table></html>",
             response_->ToString()) << "Expected different ToString";
 
   CleanUp();

@@ -24,7 +24,9 @@ static std::unique_ptr<Response> Parse(const std::string& raw_response)
     }
     void SetStatus(const ResponseCode response_code);
     void AddHeader(const std::string& header_name, const std::string& header_value);
+    void SetOrAddHeader(const std::string& header_name, const std::string& header_value);
     void SetBody(const std::string& body);
+    std::string GetBody() { return response_body; }
     std::string get_header(std::string header);
     std::string GetStatus() const { return status; }
   private:

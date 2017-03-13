@@ -5,6 +5,7 @@
 #include <string>
 #include <fstream>
 #include <sstream>
+#include "markdown.h"
 
 StaticHandler::StaticHandler()
 {
@@ -51,13 +52,36 @@ RequestHandler::Status StaticHandler::HandleRequest(const Request& request,
   std::ifstream f(full_path.c_str(),std::ios::in|std::ios::binary|std::ios::ate);
   if (f.is_open())
   {
-    std::streampos size = f.tellg();
-    char* membuff = new char[size];
-    f.seekg (0, std::ios::beg);
-    f.read(membuff, size);
-    f.close();
-    std::string body(membuff, size);
-    delete membuff;
+    std::string body;
+    if (ext == MD)
+    {
+      f.close();
+      f.open(full_path);
+      std::ostringstream o;
+      markdown::Document d;
+      if(d.read(f))
+      {
+        d.write(o);
+        body = o.str();
+        f.close();       
+      }
+      else
+      {
+        f.close();
+        SetNotFound(request, response);
+        return RequestHandler::Status::NOT_FOUND;
+      }
+    }
+    else 
+    {
+      std::streampos size = f.tellg();
+      char* membuff = new char[size];
+      f.seekg (0, std::ios::beg);
+      f.read(membuff, size);
+      f.close();
+      body = std::string(membuff, size);
+      delete membuff;
+    }
     SetOk(request, response, body);
   }
   else
@@ -100,7 +124,7 @@ void StaticHandler::SetOk(const Request& req, Response* res, std::string file_bo
 
 std::string StaticHandler::GetContentType()
 {
-  if (ext == HTML)
+  if (ext == HTML || ext == MD)
     return "text/html";
   else if (ext == JPG)
     return "image/jpeg";
@@ -134,6 +158,8 @@ void StaticHandler::GetExtension(std::string uri)
     ext = GIF;
   else if (!extension_string.compare("json"))
     ext = JSON;
+  else if (!extension_string.compare("md"))
+    ext = MD;
   else 
     ext = TXT;
 }

@@ -12,7 +12,7 @@ class StaticHandler: public RequestHandler {
     							                 Response* response);
 
   private:
-    enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON} ext;
+    enum Extension {NOEXT, HTML, JPG, TXT, CSS, GIF, JS, JSON, MD} ext;
     void GetExtension(std::string uri);
     std::string GetContentType();
     void SetNotFound(const Request& req, Response* res);

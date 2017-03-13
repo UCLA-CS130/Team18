@@ -15,6 +15,7 @@
 #include <memory>
 #include <string>
 #include "request_handler.h"
+#include "gzip_handler.h"
 #include "response.h"
 
 using boost::asio::ip::tcp;
@@ -42,6 +43,7 @@ private:
     tcp::socket socket_;
     std::string msg;
     std::map<std::string, RequestHandler*> handlers_;
+    GzipHandler* gzip_handler_;
     RequestHandler* default_handler_;
     std::unique_ptr<Request> request;
     Response* response;
